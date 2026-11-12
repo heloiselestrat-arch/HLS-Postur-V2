@@ -1,0 +1,11 @@
+{
+  "name": "HLS Postur V2.1",
+  "short_name": "HLS Postur",
+  "description": "Base clients hors ligne avec synchronisation multi-appareils",
+  "start_url": "./HLS-Postur-V2.1-multi-appareils.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#0f766e",
+  "lang": "fr",
+  "icons": []
+}

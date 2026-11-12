@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest-v21.webmanifest">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="color-scheme" content="light dark">
+<title>Étude posturale vélo</title>
+<style>
+:root{--bg:#f4f6f8;--card:#ffffff;--ink:#1d2733;--muted:#5d6b7a;--line:#dde3ea;--accent:#0f766e;--accent-ink:#ffffff;--ok:#15803d;--ok-bg:#dcfce7;--warn:#b45309;--warn-bg:#fef3c7;--bad:#b91c1c;--bad-bg:#fee2e2;--soft:#eef6f5}
+@media (prefers-color-scheme: dark){:root{--bg:#11161c;--card:#1a222b;--ink:#e6edf3;--muted:#9aa7b4;--line:#2c3742;--accent:#2dd4bf;--accent-ink:#04201d;--ok:#4ade80;--ok-bg:#12321f;--warn:#fbbf24;--warn-bg:#3a2c0b;--bad:#f87171;--bad-bg:#3b1515;--soft:#16302d}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{background:var(--accent);color:var(--accent-ink);padding-block:16px;padding-inline:24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:20px}
+header .sub{font-size:13px;opacity:.85}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+nav{display:flex;gap:4px;flex-wrap:wrap;padding-block:10px 0;padding-inline:24px;border-block-end:1px solid var(--line);background:var(--card)}
+nav button{border:0;background:transparent;color:var(--muted);padding-block:10px;padding-inline:14px;font:inherit;cursor:pointer;border-block-end:3px solid transparent}
+nav button.active{color:var(--accent);border-block-end-color:var(--accent);font-weight:600}
+main{max-width:1100px;margin-inline:auto;padding:20px}
+section.tab{display:none}
+section.tab.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-block-end:16px}
+.card h2{margin-block:0 12px;font-size:17px}
+.card p.hint{color:var(--muted);font-size:13px;margin-block:-6px 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:7px 14px;font:inherit;cursor:pointer}
+.btn.ghost{background:transparent;color:inherit;border-color:currentColor}
+.btn.small{padding:4px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 8px;border-block-end:1px solid var(--line);text-align:start;vertical-align:middle}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+td input{width:100%;min-width:60px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.na{background:var(--bg);color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.kpi{background:var(--soft);border-radius:8px;padding:12px}
+.kpi .v{font-size:22px;font-weight:700}
+.kpi .l{font-size:12px;color:var(--muted)}
+.delta.pos{color:var(--ok)} .delta.neg{color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted);font-size:13px}
+.report h3{margin-block:18px 6px;font-size:15px;border-block-end:2px solid var(--accent);padding-block-end:3px}
+.report table{margin-block-end:8px}
+#clientList li{margin-block:4px}
+#toast{position:fixed;inset-block-end:20px;inset-inline-start:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:6px;opacity:0;transition:opacity .3s;pointer-events:none}
+#toast.show{opacity:1}
+.seg{display:inline-flex;border:1px solid var(--accent);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--accent);padding:7px 14px;font:inherit;cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.rephead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-block-end:3px solid var(--accent);padding-block-end:8px;margin-block-end:6px}
+.rephead h2{margin:0}.rephead .pr{text-align:end;font-size:13px;color:var(--muted)}
+.report .phwrap{max-width:340px}.report .photos{grid-template-columns:repeat(2,minmax(0,340px))}
+.report .bodies{max-width:340px}.report .kpis{grid-template-columns:repeat(3,1fr)}
+@page{size:A4;margin:12mm}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.report h3{break-after:avoid}.report tr,.report figure,.report .phwrap,.report svg{break-inside:avoid}.report table{font-size:12px}
+header,nav,.noprint{display:none!important}section.tab{display:none!important}#tab-rapport{display:block!important}.card{border:0;padding:0}body{background:#fff;color:#000}}
+.painwrap{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:18px}
+@media (max-width:800px){.painwrap{grid-template-columns:1fr}}
+.bodies{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bodies figure{margin:0;text-align:center}
+.bodies figcaption{font-weight:600;font-size:13px;color:var(--muted);margin-block-end:4px}
+svg.body{width:100%;height:auto;background:var(--bg);border-radius:8px;cursor:crosshair}
+svg.body .sil{fill:var(--soft);stroke:var(--muted);stroke-width:1.2}
+svg.body .cur{fill:rgba(220,38,38,.15);stroke:#dc2626;stroke-width:2.5}
+svg.body .ant{fill:rgba(37,99,235,.08);stroke:#2563eb;stroke-width:2.5;stroke-dasharray:5 3}
+svg.body text.n{font-size:11px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+svg.body text.n.c{fill:#dc2626} svg.body text.n.a{fill:#2563eb}
+.sidelbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding-inline:6px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-block:10px}
+.lg{display:inline-block;width:18px;height:12px;border-radius:50%;margin-inline-end:6px;vertical-align:middle}
+.lg.cur{border:2.5px solid #dc2626}.lg.ant{border:2.5px dashed #2563eb}
+.pitem{border:1px solid var(--line);border-inline-start:5px solid #dc2626;border-radius:8px;padding:10px;margin-block-end:10px}
+.pitem.ant{border-inline-start:5px dashed #2563eb}
+.pitem .ph{display:flex;justify-content:space-between;align-items:center;margin-block-end:8px;font-weight:600}
+.pitem .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.pitem textarea{min-height:50px;margin-block-start:8px;width:100%}
+.inten{display:flex;align-items:center;gap:8px}.inten input{flex:1;padding:0}.inten b{min-width:38px}
+.pm{border:1px solid var(--line);border-radius:8px;padding:12px;margin-block-end:12px}
+.pm h3{margin:0 0 6px;font-size:15px}
+.pm details{font-size:13px;color:var(--muted);margin-block-end:8px}
+.pm details summary{cursor:pointer;color:var(--accent);font-weight:600}
+.pm details ul{margin-block:6px;padding-inline-start:20px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer;color:var(--ink)}
+.opts label.sel{border-color:var(--accent);background:var(--soft);font-weight:600}
+.reco{margin-block-start:10px;background:var(--soft);border-inline-start:4px solid var(--accent);border-radius:6px;padding:10px 12px;font-size:13.5px}
+.reco ul{margin:4px 0 0;padding-inline-start:18px}
+.legend5{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted)}
+.legend5 b{display:inline-block;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;color:#fff;margin-inline-end:4px}
+.legend5 span:nth-child(1) b,.sb[data-s="0"].on{background:#b91c1c}.legend5 span:nth-child(2) b,.sb[data-s="1"].on{background:#ea580c}
+.legend5 span:nth-child(3) b,.sb[data-s="2"].on{background:#ca8a04}.legend5 span:nth-child(4) b,.sb[data-s="3"].on{background:#16a34a}.legend5 span:nth-child(5) b,.sb[data-s="4"].on{background:#0f766e}
+.majgrid{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+@media (max-width:860px){.majgrid{grid-template-columns:1fr}}
+.mrow{border-block-end:1px solid var(--line);padding-block:9px}
+.mrow:last-child{border-block-end:0}
+.mtop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.mname{font-weight:600}
+.mname small{display:block;font-weight:400;color:var(--muted);font-size:12px;max-width:430px}
+.scores{display:flex;gap:4px}
+.sb{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.sb.on{color:#fff;border-color:transparent}
+.mextra{display:flex;flex-wrap:wrap;gap:8px;margin-block-start:6px}
+.mextra label{flex-direction:row;align-items:center;gap:6px;font-size:12px}
+.mextra input,.mextra select{padding:4px 6px;font-size:13px}
+.mextra input[type=number]{width:80px}
+.mextra input.note{width:220px}
+.impact{font-size:12px;color:var(--muted);margin-block-start:4px}
+.impact summary{cursor:pointer;color:var(--accent)}
+svg.radar{width:100%;height:auto}
+svg.radar .g{fill:none;stroke:var(--line)}
+svg.radar .ax{stroke:var(--line)}
+svg.radar .poly{fill:rgba(15,118,110,.25);stroke:var(--accent);stroke-width:2}
+svg.radar .pt{fill:var(--accent)}
+svg.radar text{fill:var(--ink);font-size:10.5px}
+svg.radar text.lv{fill:var(--muted);font-size:9px}
+.catscore{text-align:center;font-weight:700;font-size:18px;color:var(--accent)}
+.majglob{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:16px;align-items:center}
+@media (max-width:760px){.majglob{grid-template-columns:1fr}}
+.recog h3{margin-block:16px 6px;font-size:15px;border-block-end:2px solid var(--accent);padding-block-end:3px}
+.recog ul{margin:0;padding-inline-start:20px}.recog li{margin-block:6px}
+.recog .why{display:block;font-size:12px;color:var(--muted)}
+.recog .ref{font-size:11px;color:var(--accent);font-weight:700}
+.refs{font-size:12px;color:var(--muted)}.refs a{color:var(--accent)}
+.bikes{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:14px}
+@media (max-width:520px){.bikes{grid-template-columns:1fr}}
+.bikes figure{margin:0}
+.bikes figcaption{font-weight:700;color:var(--accent);margin-block-end:4px}
+.bikebox{position:relative;background:var(--bg);border-radius:8px}
+.bikebox svg{width:100%;height:auto;display:block}
+.bikebox input{position:absolute;width:68px;padding:2px 4px;font-size:12.5px;transform:translateY(-50%);background:var(--card);border:1.5px solid #2563eb}
+svg.bike .tube{stroke:#a3a9b1;stroke-width:11;stroke-linecap:round;fill:none}
+svg.bike .wheel{stroke:#b9bec5;stroke-width:9;fill:none}
+svg.bike .thin{stroke:#b9bec5;stroke-width:3;fill:none}
+svg.bike .part{fill:#b3b8bf;stroke:#8d939b;stroke-width:2}
+svg.bike .cote{stroke:#2563eb;stroke-width:3;fill:none}
+svg.bike .dash{stroke:#2563eb;stroke-width:1.6;stroke-dasharray:5 4;fill:none}
+svg.bike .dot{fill:#2563eb}
+svg.bike .bub{fill:#dbeafe;stroke:#2563eb;stroke-width:2}
+svg.bike text{font-size:17px;font-weight:700;fill:#1e3a8a;text-anchor:middle;dominant-baseline:central}
+svg.bike text.lbl{font-size:13px;font-weight:400;fill:var(--muted);text-anchor:start}
+.photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.phcol h3{margin:0 0 6px;font-size:15px;color:var(--accent)}
+.phwrap{position:relative;border-radius:8px;overflow:hidden;background:var(--bg)}
+.phwrap img{display:block;width:100%;height:auto}
+.phwrap svg{position:absolute;inset:0;width:100%;height:100%}
+.phwrap svg.placing{cursor:crosshair}
+.phwrap .sk{stroke:#facc15;stroke-width:3;fill:none}
+.phwrap .jp{fill:#ef4444;stroke:#fff;stroke-width:2;cursor:grab}
+.phwrap text{fill:#fff;font-weight:700;paint-order:stroke;stroke:#000;stroke-width:3px}
+.phdrop{border:2px dashed var(--line);border-radius:8px;padding:30px;text-align:center;color:var(--muted)}
+.phstatus{font-size:13px;color:var(--muted);min-height:18px;margin-block:6px}
+.phbtns{display:flex;flex-wrap:wrap;gap:6px;margin-block-start:6px}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.shoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.shoe h3{margin:0 0 6px;font-size:15px;color:var(--accent);text-align:center}
+.shoe svg{width:100%;max-width:260px;height:auto;display:block;margin-inline:auto}
+svg.sole .sl{fill:var(--soft);stroke:var(--muted);stroke-width:2.5}
+svg.sole .ref{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:6 4}
+svg.sole .cl{fill:rgba(37,99,235,.85);stroke:#1e40af;stroke-width:2}
+svg.sole .ax{stroke:#fff;stroke-width:1.5}
+svg.sole .rax{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+svg.sole text{font-size:12px;fill:var(--muted)}
+.shoe .cin{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-block-start:8px}
+.shoe .cin input{width:100%}
+.shoe .csum{font-size:13px;text-align:center;margin-block-start:6px;min-height:18px}
+td.rng{white-space:nowrap}td.rng input{width:58px;min-width:0}
+
+/* V2 : base clients persistante, mode hors ligne et synchronisation */
+.syncbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.syncdot{width:10px;height:10px;border-radius:50%;display:inline-block;background:#ca8a04}.syncdot.ok{background:#16a34a}.syncdot.bad{background:#b91c1c}.syncdot.off{background:#64748b}
+.client-tools{display:flex;gap:8px;flex-wrap:wrap;margin-block-end:12px}.client-tools input{flex:1;min-width:220px}
+.client-card{border:1px solid var(--line);border-radius:9px;padding:12px;margin-block:8px 0;background:var(--bg)}
+.client-card .meta{color:var(--muted);font-size:12px;margin:3px 0 8px}.client-card .actions{display:flex;gap:6px;flex-wrap:wrap}
+.sync-settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.sync-settings input{width:100%}
+@media (display-mode:standalone){#btnInstall{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>🚴 Étude posturale vélo</h1><div class="sub" id="hdrClient">Nouvelle étude</div></div>
+  <div class="hbtns">
+    <button class="btn ghost small" id="btnNew" type="button">Nouvelle étude</button>
+    <span class="syncbar"><i class="syncdot" id="syncDot"></i><span id="syncText">Initialisation…</span></span><button class="btn ghost small" id="btnInstall" type="button" hidden>Installer l’app</button><button class="btn ghost small" id="btnSave" type="button">Enregistrer le dossier</button>
+  </div>
+</header>
+<nav id="tabs">
+  <button type="button" data-tab="client" class="active">1. Entretien préalable</button>
+  <button type="button" data-tab="eval">2. Évaluation</button>
+  <button type="button" data-tab="majeurs">3. Les 5 majeurs</button>
+  <button type="button" data-tab="recos">4. Recommandations</button>
+  <button type="button" data-tab="angles">5. Angles</button>
+  <button type="button" data-tab="reglages">6. Position</button>
+  <button type="button" data-tab="cales">7. Cales</button>
+  <button type="button" data-tab="rapport">8. Rapport</button>
+  <button type="button" data-tab="dossiers">Dossiers</button>
+</nav>
+<main>
+
+<section class="tab active" id="tab-client">
+  <div class="card"><h2>Informations personnelles</h2>
+    <div class="grid">
+      <label>Nom<input data-f="nom" type="text"></label>
+      <label>Prénom<input data-f="prenom" type="text"></label>
+      <label>Profession<input data-f="profession" type="text"></label>
+      <label>Date de l'entretien<input data-f="date" type="date"></label>
+    </div>
+  </div>
+  <div class="card"><h2>Informations vélo</h2>
+    <div class="grid">
+      <label>Marque du vélo<input data-f="marque" type="text"></label>
+      <label>Modèle<input data-f="modele" type="text"></label>
+      <label>Année<input data-f="annee" type="number" min="1950" max="2100"></label>
+      <label>Type de vélo<select data-f="discipline" id="discipline">
+        <option value="route">Route – endurance</option><option value="route_sport">Route – performance</option>
+        <option value="gravel">Gravel</option><option value="vtt">VTT</option>
+        <option value="clm">Triathlon / CLM</option><option value="urbain">Urbain / VAE</option></select></label>
+      <label>Marque des cales<input data-f="cales" type="text"></label>
+      <label>Marque de selle<input data-f="selle" type="text"></label>
+    </div>
+  </div>
+  <div class="card"><h2>Contexte et objectifs</h2>
+    <div class="grid">
+      <label>Motif de consultation<textarea data-f="motif"></textarea></label>
+      <label>Objectifs<textarea data-f="objectifs"></textarea></label>
+    </div>
+    <div class="grid" style="margin-block-start:12px">
+      <label>Nombre de sorties / semaine<input data-f="sorties" type="number" min="0" step="1"></label>
+      <label>Kilomètres / semaine<input data-f="km" type="number" min="0" step="1"></label>
+    </div>
+    <div class="grid" style="margin-block-start:12px">
+      <label>Objectif de position<select data-f="obj_pos"><option value="">Confort / équilibre</option><option value="aero">Position aéro (compétition route)</option></select></label>
+      <label>Vitesse moyenne en course (km/h)<input data-f="vit_course" type="number" min="0" step="0.5"></label>
+      <label>Type d'épreuves<select data-f="epreuves"><option></option><option>Courses en ligne</option><option>Critériums</option><option>Contre-la-montre</option><option>Cyclosportives</option><option>Mixte</option></select></label>
+      <label>Cycliste femme (surveillance périnée)<select data-f="sexe_f"><option value="">Non précisé</option><option value="oui">Oui</option><option value="non">Non</option></select></label>
+    </div>
+  </div>
+</section>
+
+<section class="tab" id="tab-eval">
+  <div class="card"><h2>Douleurs et antécédents</h2>
+    <p class="hint">Ajoutez chaque douleur actuelle ou antécédent : la zone est entourée sur le schéma (rouge : douleur actuelle ; bleu en pointillé : antécédent). Vous pouvez aussi cliquer directement sur le schéma pour placer une zone. Les recommandations liées aux pathologies choisies s'affichent dans l'onglet 4. Recommandations.</p>
+    <div class="painwrap">
+      <div class="bodies">
+        <figure><figcaption>Face</figcaption><svg class="body" data-view="face" viewBox="0 0 200 440" role="img" aria-label="Schéma de face"></svg><div class="sidelbl"><span>Droite</span><span>Gauche</span></div></figure>
+        <figure><figcaption>Dos</figcaption><svg class="body" data-view="dos" viewBox="0 0 200 440" role="img" aria-label="Schéma de dos"></svg><div class="sidelbl"><span>Gauche</span><span>Droite</span></div></figure>
+      </div>
+      <div class="painlist">
+        <div class="row noprint"><button class="btn small" type="button" id="addPain">+ Douleur actuelle</button><button class="btn ghost small" type="button" id="addAnte">+ Antécédent</button></div>
+        <div class="legend"><span><i class="lg cur"></i>Douleur actuelle</span><span><i class="lg ant"></i>Antécédent</span></div>
+        <div id="painItems"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><h2>Préférences motrices</h2>
+    <p class="hint">Sélectionnez le résultat de chaque test : la conséquence sur le réglage s'affiche automatiquement.</p>
+    <div id="pmBlocks"></div>
+    <label style="margin-block-start:12px">Observations complémentaires<textarea data-f="pm_notes"></textarea></label>
+  </div>
+</section>
+
+
+<section class="tab" id="tab-majeurs">
+  <div class="card"><h2>Les 5 majeurs</h2>
+    <p class="hint">Notez chaque exercice de 0 à 4. Pour les exercices bilatéraux, indiquez le côté déficitaire s'il y en a un.</p>
+    <div class="legend5"><span><b>0</b> Impossible ou douloureux</span><span><b>1</b> Limitation importante</span><span><b>2</b> Limitation légère</span><span><b>3</b> Normal</span><span><b>4</b> Très bon</span></div>
+  </div>
+  <div id="majBlocks"></div>
+  <div class="card"><h2>Vue globale des 5 majeurs</h2>
+    <div class="majglob"><div id="radarGlobal"></div><div id="globKpis" class="kpis"></div></div>
+  </div>
+</section>
+
+
+
+
+<section class="tab" id="tab-recos">
+  <div class="card"><h2>Recommandations</h2>
+    <p class="hint">Synthèse automatique de tout le bilan : entretien, douleurs et pathologies, préférences motrices, 5 majeurs, objectif de position. Chaque bloc se met à jour dès qu'une donnée change.</p>
+    <p class="muted" id="recoNoAero" style="font-size:12.5px">Objectif aéro non sélectionné (onglet 1) : le bloc « Objectif position aéro » est masqué.</p>
+  </div>
+  <div class="card"><h2>1. Selon les pathologies</h2>
+    <p class="hint">Affichées automatiquement selon la pathologie choisie pour chaque douleur ou antécédent. Les pathologies actuelles sont aussi prises en compte dans les angles conseillés, le recul de selle, le reach et le drop, et le bloc selle.</p>
+    <div id="pathoBox"></div>
+  </div>
+  <div class="card" id="aeroCard" hidden><h2>2. Objectif position aéro (compétition route)</h2>
+    <p class="hint">Feux vert / orange / rouge calculés à partir des 5 majeurs, des douleurs, du profil moteur et de la vitesse de course (onglet 1).</p>
+    <div id="aeroBox"></div>
+  </div>
+  <div class="card"><h2>3. Poste de pilotage et recul de selle</h2>
+    <p class="hint">Orientation calculée automatiquement à partir des douleurs actuelles (onglet Évaluation), des 5 majeurs et des préférences motrices.</p>
+    <div id="rdBox"></div>
+  </div>
+  <div class="card"><h2>4. Selle et appuis</h2>
+    <p class="hint">Forme de selle selon le profil moteur, la pratique, l'objectif aéro et les douleurs ; recommandations selon les douleurs du périnée, des mains, des poignets et des fesses (onglet Évaluation).</p>
+    <div id="selleBox"></div>
+  </div>
+  <div class="card"><h2>5. Cales</h2>
+    <p class="hint">Orientation selon le profil moteur (aérien / terrien, axial / latéral), les pathologies et les 5 majeurs. Saisie de la position réelle dans l'onglet Cales.</p>
+    <div id="calesRecoBox"></div>
+  </div>
+  <div class="card"><h2>6. Angles visés (pédale au point bas)</h2>
+    <div id="angSumBox"></div>
+  </div>
+  <div class="card noprint" style="text-align:center">
+    <button class="btn" type="button" id="btnReco" style="font-size:16px;padding:10px 22px">7. Recommandations détaillées des 5 majeurs (avec sources)</button>
+    <p class="muted" style="margin-block-start:8px">Pistes générées à partir des notes saisies et de la littérature scientifique, à valider par l'analyse sur le vélo.</p>
+  </div>
+  <div class="card" id="recoBox" hidden></div>
+</section>
+
+<section class="tab" id="tab-angles">
+  <div class="card"><h2>Analyse photo avant / après</h2>
+    <p class="hint">Ajoutez une photo de profil avant et après réglage. Lancez la détection automatique ou placez les points à la main (pied, cheville, genou, hanche, épaule, coude, poignet). Les points peuvent être déplacés à la souris.</p>
+    <div class="photos">
+      <div class="phcol" data-w="av"></div>
+      <div class="phcol" data-w="ap"></div>
+    </div>
+    <table style="margin-block-start:14px"><thead><tr><th>Articulation</th><th>Avant</th><th>Après</th><th>Différence</th></tr></thead><tbody id="photoAngBody"></tbody></table>
+    <div class="row noprint" style="margin-block-start:10px">
+<span class="muted">Photos à prendre de profil, pédale au point le plus bas.</span>
+      
+    </div>
+  </div>
+  <div class="card"><h2>Fourchettes d'angles conseillées</h2>
+    <p class="hint">Fourchettes de référence pédale au point le plus bas (modifiables). Selon le bilan des 5 majeurs, les préférences motrices, les douleurs actuelles et la pratique, l'application indique s'il faut viser le bas, le milieu ou le haut de chaque fourchette.</p>
+    <table><thead><tr><th>Articulation</th><th>Fourchette de référence</th><th>Cible conseillée</th><th>Avant (photo)</th><th>Après (photo)</th></tr></thead>
+    <tbody id="anglesBody"></tbody></table>
+    <div class="row noprint" style="margin-block-start:10px"><button class="btn ghost small" type="button" id="btnResetRanges">Rétablir les bases par défaut</button></div>
+    <p class="muted">Repères indicatifs, à valider par l'analyse dynamique.</p>
+  </div>
+</section>
+
+<section class="tab" id="tab-reglages">
+  <div class="card"><h2>Prises de cotes</h2>
+    <p class="hint">Complétez les cotes directement sur les schémas (mm, et degrés pour la cote 7). Le tableau en dessous se remplit automatiquement.</p>
+    <div class="bikes">
+      <figure><figcaption>Avant réglage</figcaption><div class="bikebox" data-w="av"></div></figure>
+      <figure><figcaption>Après réglage</figcaption><div class="bikebox" data-w="ap"></div></figure>
+    </div>
+    <table style="margin-block-start:14px"><thead><tr><th>N°</th><th>Cote</th><th>Avant</th><th>Après</th><th>Différence induite</th></tr></thead><tbody id="cotesBody"></tbody></table>
+  </div>
+  <div class="card"><h2>KOPS (genou / axe de pédale)</h2>
+    <p class="hint">Manivelle à l'horizontale (3 h), fil à plomb depuis la tubérosité tibiale. <b>+</b> = genou en avant de l'axe de pédale, <b>−</b> = en arrière. Repère de départ, sans valeur scientifique démontrée ; la cible tient compte de la pratique et du bilan (onglet 3).</p>
+    <div class="row" style="gap:16px">
+      <label style="flex-direction:row;align-items:center;gap:6px">Avant (mm)<input type="number" step="1" data-g="kops" data-w="av" style="width:90px"></label>
+      <label style="flex-direction:row;align-items:center;gap:6px">Après (mm)<input type="number" step="1" data-g="kops" data-w="ap" style="width:90px"></label>
+    </div>
+    <div id="kopsInfo" style="margin-block-start:10px"></div>
+    <p class="muted" style="font-size:12px">Après un changement de recul, revérifier la hauteur de selle : reculer la selle la remonte aussi.</p>
+  </div>
+  <div class="card"><h2>Composants</h2>
+    <div class="grid">
+      <label>Cintre<input data-f="comp_cintre" type="text" placeholder="ex. 420 mm, compact"></label>
+      <label>Potence<input data-f="comp_potence" type="text" placeholder="ex. 100 mm, −6°"></label>
+      <label>Manivelles<input data-f="comp_manivelles" type="text" placeholder="ex. 170 mm"></label>
+    </div>
+  </div>
+  <div class="card"><h2>Actions réalisées et recommandations</h2>
+    <div class="grid">
+      <label>Modifications effectuées<textarea data-f="modifs"></textarea></label>
+      <label>Matériel conseillé (selle, cintre, potence…)<textarea data-f="materiel"></textarea></label>
+      <label>Conseils (étirements, adaptation, suivi)<textarea data-f="conseils"></textarea></label>
+    </div>
+  </div>
+</section>
+
+
+<section class="tab" id="tab-cales">
+  <div class="card"><h2>Position des cales</h2>
+    <p class="hint">Vue de dessous des chaussures. En pointillé : la cale de référence, sous les têtes métatarsiennes. En bleu : la cale du client, positionnée selon les valeurs saisies (échelle indicative).</p>
+    <div class="shoes">
+      <div class="shoe" data-p="g"></div>
+      <div class="shoe" data-p="d"></div>
+    </div>
+    <p class="muted">Conventions : <b>avancée / recul</b> + = vers les orteils, − = vers le talon · <b>latéral</b> + = vers l'intérieur (côté vélo), − = vers l'extérieur · <b>rotation</b> + = avant de la cale tourné vers l'intérieur, − = vers l'extérieur.</p>
+    <label style="margin-block-start:10px">Observations (cales correctrices, cales d'épaisseur, semelles…)<textarea data-f="cales_notes"></textarea></label>
+  </div>
+</section>
+
+
+<section class="tab" id="tab-rapport">
+  <div class="card noprint">
+    <div class="row" style="justify-content:space-between">
+      <div class="seg" id="repMode"><button type="button" data-mode="prat" class="on">Version praticien</button><button type="button" data-mode="client">Version client</button></div>
+      <div class="row"><button class="btn" type="button" id="btnPrint">Exporter en PDF</button></div>
+    </div>
+    <div class="grid" style="margin-block-start:12px">
+      <label>Praticien / cabinet (en-tête du rapport)<input data-f="prat_nom" type="text"></label>
+      <label>Coordonnées (téléphone, e-mail, adresse)<input data-f="prat_contact" type="text"></label>
+    </div>
+    <p class="muted" style="margin-block:10px 0">« Exporter en PDF » ouvre l'impression : choisissez <b>Enregistrer au format PDF</b> comme imprimante. La version praticien contient tout le bilan ; la version client ne garde que l'essentiel (objectifs, douleurs, profil, position avant / après, cales, angles et conseils).</p>
+  </div>
+  <div class="card report" id="report"></div>
+</section>
+
+<section class="tab" id="tab-dossiers">
+  <div class="card"><h2>Base clients</h2>
+    <p class="hint">Les dossiers sont enregistrés automatiquement sur cet appareil et restent disponibles hors connexion. Le PDF n'est nécessaire que pour remettre un compte rendu au client.</p>
+    <div class="client-tools noprint"><input id="clientSearch" type="search" placeholder="Rechercher par nom, prénom, vélo ou date"><button class="btn small" id="btnClientNew" type="button">+ Nouveau client</button><button class="btn ghost small" id="btnSync" type="button">Synchroniser maintenant</button></div>
+    <div id="clientList"></div>
+  </div>
+  <div class="card"><h2>Synchronisation en ligne (Supabase)</h2>
+    <p class="hint">Facultatif. L'application fonctionne déjà hors ligne. Pour retrouver les dossiers sur plusieurs appareils, renseignez votre projet Supabase puis connectez-vous.</p>
+    <div class="sync-settings">
+      <label>URL du projet<input id="sbUrl" type="url" placeholder="https://xxxx.supabase.co"></label>
+      <label>Clé publique anon<input id="sbKey" type="password" autocomplete="off"></label>
+      <label>Adresse e-mail<input id="sbEmail" type="email" autocomplete="username"></label>
+      <label>Mot de passe (8 caractères minimum)<input id="sbPassword" type="password" minlength="8" autocomplete="current-password"></label>
+    </div>
+    <div class="row noprint" style="margin-block-start:10px"><button class="btn small" id="btnCloudSave" type="button">Enregistrer la configuration</button><button class="btn ghost small" id="btnCloudSignup" type="button">Créer mon compte</button><button class="btn ghost small" id="btnCloudLogin" type="button">Se connecter et synchroniser</button><button class="btn ghost small" id="btnCloudLogout" type="button">Déconnecter</button></div>
+    <p class="muted" id="cloudMsg" style="margin-block-start:8px">Aucune synchronisation en ligne configurée.</p>
+  </div>
+  <div class="card"><h2>Sauvegarde de sécurité</h2>
+    <div class="row noprint"><button class="btn small" type="button" id="btnExport">Exporter tous les dossiers</button><button class="btn small" type="button" id="btnDownload">Télécharger (.json)</button><button class="btn ghost small" type="button" id="btnImport">Importer le texte collé</button></div>
+    <label style="margin-block-start:10px">Données (copiez ce texte pour le sauvegarder, ou collez-en un pour le recharger)<textarea id="ioText" style="min-height:140px;font-family:monospace;font-size:12px"></textarea></label>
+  </div>
+</section>
+</main>
+<div id="toast"></div>
+
+<script>
+(function(){
+const BASE={cheville:[90,102],genou:[33,43],hanche:[32,52],dos:[45,55],epaule:[75,90],coude:[10,25]};
+
+
+let db=[];let cur=blank();let autoSaveTimer=null;let deferredInstallPrompt=null;
+function blank(){return {id:Date.now().toString(36),f:{date:new Date().toISOString().slice(0,10),discipline:"route"},angles:{},regl:{},ranges:null,douleurs:[],pm:{},maj:{},recoHtml:"",photos:{},cales:{g:{},d:{}}};}
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+function num(v){const n=parseFloat(String(v).replace(",","."));return isNaN(n)?null:n;}
+function fullName(f){return [f.prenom,f.nom].filter(Boolean).join(" ");}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2000);}
+function ranges(){if(!cur.ranges||!cur.ranges.genou||!cur.ranges.coude)cur.ranges=JSON.parse(JSON.stringify(BASE));Object.keys(BASE).forEach(k=>{if(!cur.ranges[k])cur.ranges[k]=BASE[k].slice();});return cur.ranges;}
+function status(v,r){if(v==null)return '<span class="pill na">—</span>';const[a,b]=r;if(v>=a&&v<=b)return '<span class="pill ok">Dans la plage</span>';const d=v<a?a-v:v-b,w=(b-a)*0.25||2;return d<=w?'<span class="pill warn">'+(v<a?"Un peu bas":"Un peu haut")+'</span>':'<span class="pill bad">'+(v<a?"Trop bas":"Trop haut")+'</span>';}
+
+function renderCalc(){}
+let repMode="prat";
+function renderReport(){const f=cur.f;const discTxt=$("#discipline").selectedOptions[0]?.textContent||"";const C=repMode==="client";
+ const row=(l,v)=>v?`<tr><th style="width:35%">${l}</th><td>${esc(v)}</td></tr>`:"";
+ const d=f.date?new Date(f.date).toLocaleDateString("fr-FR"):"";
+ let h=`<div class="rephead"><div><h2>${C?"Votre étude posturale":"Bilan d'étude posturale — version praticien"}</h2><div class="muted">${esc(fullName(f)||"Client")}${d?" — "+d:""}${discTxt?" — "+esc(discTxt):""}</div></div>${f.prat_nom||f.prat_contact?`<div class="pr"><b>${esc(f.prat_nom||"")}</b><br>${esc(f.prat_contact||"")}</div>`:""}</div>`;
+ if(!C)h+=`<h3>Informations personnelles</h3><table>${row("Nom",f.nom)}${row("Prénom",f.prenom)}${row("Profession",f.profession)}</table>`;
+ h+=`<h3>${C?"Votre vélo":"Informations vélo"}</h3><table>${row("Marque",f.marque)}${row("Modèle",f.modele)}${row("Année",f.annee)}${row("Type",discTxt)}${row("Marque des cales",f.cales)}${row("Marque de selle",f.selle)}</table>`;
+ h+=`<h3>${C?"Vos objectifs":"Contexte et objectifs"}</h3><table>${row("Motif de consultation",f.motif)}${row("Objectifs",f.objectifs)}${row("Sorties / semaine",f.sorties)}${row("Kilomètres / semaine",f.km&&f.km+" km")}</table>`;
+ if(C){h+=clientEval();h+=pathoReport(false);h+=clientMaj();}else{h+=evalReport();h+=pathoReport(true);h+=majReport();}
+ if(Object.keys(cur.maj||{}).length||(cur.douleurs||[]).length)h+=rdReport(!C);
+ h+=aeroReport(!C);
+ h+=selleReport(!C);
+ h+=calesRecoReport(!C);
+ h+=photoReport();
+ if(!C)h+=angleReport();
+ h+=posReport();
+ h+=kopsReport();
+ h+=calesReport();
+ h+=`<h3>${C?"Ce que nous avons fait et nos conseils":"Recommandations"}</h3><table>${row("Modifications effectuées",f.modifs)}${row("Matériel conseillé",f.materiel)}${row("Conseils",f.conseils)}</table>`;
+ if(C)h+=`<p class="muted" style="margin-block-start:14px">Une nouvelle position demande un temps d'adaptation : augmentez progressivement la durée des sorties et signalez toute gêne persistante.</p>`;
+ $("#report").innerHTML=h;}
+function clientEval(){let h="";const L=cur.douleurs||[];
+ if(L.length)h+=`<h3>Douleurs et antécédents signalés</h3><div class="bodies"><figure><figcaption>Face</figcaption><svg class="body" viewBox="0 0 200 440">${SIL+svgMarks("face")}</svg></figure><figure><figcaption>Dos</figcaption><svg class="body" viewBox="0 0 200 440">${SIL+svgMarks("dos")}</svg></figure></div><table><thead><tr><th>N°</th><th>Type</th><th>Localisation</th><th>Côté</th><th>Intensité</th></tr></thead><tbody>${L.map((p,i)=>`<tr><td>${i+1}</td><td>${p.type==="ant"?"Antécédent":"Douleur actuelle"}</td><td>${esc(ZMAP[p.zone]?ZMAP[p.zone][1]:"")}</td><td>${esc(p.cote||"")}</td><td>${p.int??"—"}/10</td></tr>`).join("")}</tbody></table>`;
+ const pm=cur.pm||{},sel=PM.filter(b=>pm[b.k]);
+ if(sel.length)h+=`<h3>Votre profil moteur</h3><table>${sel.map(b=>{const o=b.o.find(x=>x[0]===pm[b.k]);return `<tr><th style="width:35%">${b.t.split(":")[0]}</th><td><b>${o[1]}</b>${o[3].length?`<div class="muted" style="font-size:12px">${o[3][0].replace(/<[^>]+>/g,"")}</div>`:""}</td></tr>`}).join("")}</table>`;
+ return h;}
+function clientMaj(){if(!Object.keys(cur.maj||{}).some(k=>sc(k)!=null))return "";
+ return `<h3>Votre bilan physique (les 5 majeurs)</h3><div class="majglob"><div>${radar(MAJ.map(c=>c.t),MAJ.map(catMean),320)}</div><table><tbody>${MAJ.map(c=>`<tr><th>${c.t}</th><td>${fmtS(catMean(c))} / 4</td></tr>`).join("")}</tbody></table></div><p class="muted">Échelle : 0 impossible ou douloureux · 1 limitation importante · 2 limitation légère · 3 normal · 4 très bon.</p>`;}
+function renderList(){
+ const q=($("#clientSearch")?.value||"").trim().toLowerCase();
+ const rows=db.slice().sort((a,b)=>String(b.f?.date||"").localeCompare(String(a.f?.date||""))).filter(d=>{
+  const hay=[fullName(d.f||{}),d.f?.marque,d.f?.modele,d.f?.date].filter(Boolean).join(" ").toLowerCase();return !q||hay.includes(q);
+ });
+ $("#clientList").innerHTML=rows.length?rows.map(d=>`<div class="client-card"><strong>${esc(fullName(d.f)||"Sans nom")}</strong><div class="meta">${d.f?.date?new Date(d.f.date).toLocaleDateString("fr-FR"):"Date non renseignée"}${d.f?.marque||d.f?.modele?" · "+esc([d.f.marque,d.f.modele].filter(Boolean).join(" ")):""}</div><div class="actions"><button class="btn small" type="button" data-open="${d.id}">Ouvrir la fiche</button><button class="btn ghost small" type="button" data-dup="${d.id}">Nouveau bilan à partir de celui-ci</button><button class="btn ghost small" type="button" data-del="${d.id}">Supprimer</button></div></div>`).join(""):'<p class="muted">Aucun dossier correspondant.</p>';
+}
+function loadForm(){$$("[data-f]").forEach(el=>{el.value=cur.f[el.dataset.f]??"";});$("#hdrClient").textContent=fullName(cur.f)?fullName(cur.f)+" — "+(cur.f.date?new Date(cur.f.date).toLocaleDateString("fr-FR"):""):"Nouvelle étude";renderAngles();renderRegl();renderCalc();renderEval();renderMaj();placing.av=placing.ap=null;renderPhotos();renderCales();}
+async function save(silent){const i=db.findIndex(d=>d.id===cur.id);const c=JSON.parse(JSON.stringify(cur));c.updatedAt=new Date().toISOString();c.syncState="pending";if(i>=0)db[i]=c;else db.push(c);await idbPut(c);renderList();setSyncState(navigator.onLine?"pending":"offline");if(!silent)toast("Dossier enregistré sur cet appareil");if(navigator.onLine&&cloudToken())syncCloud(true);}
+
+document.addEventListener("input",e=>{const t=e.target;
+ if(t.dataset.f){cur.f[t.dataset.f]=t.value;if(t.dataset.f==="discipline"){updStatus();}if(/^prat_/.test(t.dataset.f))renderReport();if(["obj_pos","vit_course","sexe_f"].includes(t.dataset.f)){renderAero();renderRD();renderSelle();updStatus();}renderCalc();if(["nom","prenom","date"].includes(t.dataset.f))$("#hdrClient").textContent=(fullName(cur.f)||"Nouvelle étude")+(cur.f.date?" — "+new Date(cur.f.date).toLocaleDateString("fr-FR"):"");}
+ else if(t.dataset.a){(cur.angles[t.dataset.a]=cur.angles[t.dataset.a]||{})[t.dataset.w]=t.value;updStatus();}
+ else if(t.dataset.r){const v=num(t.value);if(v!=null){ranges()[t.dataset.r][+t.dataset.i]=v;updStatus();}}
+ else if(t.dataset.g){(cur.regl[t.dataset.g]=cur.regl[t.dataset.g]||{})[t.dataset.w]=t.value;updDelta();}
+ scheduleAutoSave();
+});
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$$("#tabs button").forEach(x=>x.classList.toggle("active",x===b));$$("section.tab").forEach(s=>s.classList.toggle("active",s.id==="tab-"+b.dataset.tab));if(b.dataset.tab==="rapport")renderReport();if(b.dataset.tab==="angles")updStatus();if(b.dataset.tab==="majeurs"){renderRD();renderAero();renderSelle();}if(b.dataset.tab==="recos")renderRecos();if(b.dataset.tab==="reglages")updKops();if(b.dataset.tab==="dossiers")renderList();});
+$("#btnResetRanges").addEventListener("click",()=>{cur.ranges=null;renderAngles();toast("Plages rétablies");});
+$("#btnSave").addEventListener("click",save);
+$("#btnNew").addEventListener("click",async()=>{if(fullName(cur.f))await save(true);cur=blank();loadForm();toast("Nouvelle étude");});
+$("#btnPrint").addEventListener("click",()=>{renderReport();const t=document.title;document.title="Etude posturale - "+(fullName(cur.f)||"client")+(repMode==="client"?" - client":" - praticien");try{window.print();}catch(err){toast("Impression indisponible ici : ouvrez le fichier dans votre navigateur");}document.title=t;});
+$("#repMode").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;repMode=b.dataset.mode;$$("#repMode button").forEach(x=>x.classList.toggle("on",x===b));renderReport();});
+$("#clientList").addEventListener("click",async e=>{const o=e.target.dataset.open,d=e.target.dataset.del,u=e.target.dataset.dup;if(o){cur=JSON.parse(JSON.stringify(db.find(x=>x.id===o)));loadForm();$('#tabs button[data-tab="client"]').click();}if(u){const src=JSON.parse(JSON.stringify(db.find(x=>x.id===u)));src.id=Date.now().toString(36);src.f.date=new Date().toISOString().slice(0,10);src.updatedAt=new Date().toISOString();cur=src;loadForm();$('#tabs button[data-tab="client"]').click();toast("Nouveau bilan créé à partir du précédent");}if(d&&confirm("Supprimer définitivement ce dossier de cet appareil ?")){db=db.filter(x=>x.id!==d);await idbDelete(d);renderList();}});
+$("#btnExport").addEventListener("click",()=>{if(fullName(cur.f))save();$("#ioText").value=JSON.stringify(db,null,1);$("#ioText").select();toast("Données prêtes à copier");});
+$("#btnDownload").addEventListener("click",()=>{if(fullName(cur.f))save();try{const b=new Blob([JSON.stringify(db,null,1)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="etudes-posturales-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();}catch(err){toast("Téléchargement indisponible ici – utilisez Exporter");}});
+$("#btnImport").addEventListener("click",()=>{try{const d=JSON.parse($("#ioText").value);if(!Array.isArray(d))throw 0;d.forEach(x=>{const i=db.findIndex(y=>y.id===x.id);if(i>=0)db[i]=x;else db.push(x);});renderList();toast(d.length+" dossier(s) importé(s)");}catch(err){toast("Texte invalide");}});
+const ZONES=[
+ ["nuque","Nuque / cervicales","dos",0,62,14],["epaule","Épaule","face",42,80,14],["trapeze","Trapèze / haut du dos","dos",22,88,13],
+ ["omoplates","Entre les omoplates","dos",0,112,16],["coude","Coude","face",50,150,12],["poignet","Poignet / main","face",60,225,12],
+ ["lombaires","Lombaires","dos",0,185,18],["fessier","Fessier","dos",18,222,15],["hanche","Hanche","face",34,205,13],
+ ["perinee","Périnée / zone de selle","face",0,228,12],["quadri","Quadriceps","face",17,262,15],["ischio","Ischio-jambiers","dos",17,270,15],
+ ["genou_av","Genou (avant / rotule)","face",17,320,13],["genou_ext","Genou externe (bandelette)","face",29,318,10],["genou_int","Genou interne","face",6,320,10],
+ ["genou_ar","Genou (arrière)","dos",17,318,12],["mollet","Mollet","dos",17,355,14],["achille","Tendon d'Achille","dos",17,393,10],
+ ["cheville","Cheville","face",17,397,10],["pied","Pied / orteils","face",17,422,12],["autre","Autre (préciser)",null,0,0,0]
+];
+const ZMAP=Object.fromEntries(ZONES.map(z=>[z[0],z]));
+const SIL='<g class="sil"><circle cx="100" cy="34" r="22"/><rect x="91" y="54" width="18" height="16" rx="4"/><path d="M58 72 Q100 64 142 72 L140 140 Q136 180 136 212 L64 212 Q64 180 60 140 Z"/><path d="M58 74 Q46 78 44 100 L34 228 Q36 238 44 234 L56 150 L62 104 Z"/><path d="M142 74 Q154 78 156 100 L166 228 Q164 238 156 234 L144 150 L138 104 Z"/><path d="M64 210 L99 214 L97 400 L72 400 Q68 300 64 210 Z"/><path d="M136 210 L101 214 L103 400 L128 400 Q132 300 136 210 Z"/><ellipse cx="84" cy="420" rx="14" ry="16"/><ellipse cx="116" cy="420" rx="14" ry="16"/></g>';
+const PM=[
+ {k:"profil",t:"Profil : aérien ou terrien",test:"<b>Test du saut sur place :</b> faites 4 ou 5 petits sauts verticaux légers sur place, comme pour vous échauffer, puis arrêtez-vous. Comment le corps s’organise-t-il au moment de l’impact au sol ?",
+  o:[["aerien","Aérien","Rebond élastique : le rebond se fait principalement sur l’avant du pied (les métatarses). Les talons effleurent à peine le sol. Les genoux et les hanches fléchissent très peu. Le mouvement est sec, rapide et aérien.",["<b>Cales centrées ou légèrement avancées.</b> L’aérien a impérativement besoin d’une cheville mobile. En avançant un peu la cale, on permet à la cheville de jouer son rôle de « ressort » naturel à chaque tour de manivelle."]],
+     ["terrien","Terrien","Ancrage musculaire : à chaque réception, le talon s’écrase nettement au sol. Les genoux et les hanches fléchissent davantage pour amortir le poids. Le sujet a besoin de ressentir un contact solide avec la terre pour repartir.",["<b>Cales reculées au maximum.</b> Reculer les cales diminue le bras de levier de la cheville. Le pied devient une plateforme rigide d’ancrage, ce qui soulage le mollet et transfère toute la puissance directement de la cuisse à la pédale."]]]},
+ {k:"declenchement",t:"Déclenchement",test:"<b>Test du saut vertical spontané :</b> debout, effectuez 3 petits sauts verticaux sur place, de manière totalement détendue, comme pour vous échauffer. Observez la phase d’atterrissage et de relance.",
+  o:[["hanche","Cuisse / hanche","Les hanches plient beaucoup : le corps amortit et repart en faisant une flexion profonde (le buste penche, les fesses partent en arrière).",[]],
+     ["genou","Genou","L’amorti se fait surtout par les genoux : le buste reste vertical mais les genoux avancent nettement vers l’avant à l’impact.",[]],
+     ["cheville","Cheville / pied","Le rebond se fait pieds presque plats ou sur les pointes : les genoux et les hanches bougent à peine. Le mouvement est sec, rapide, géré par le ressort des chevilles.",[]]]},
+ {k:"largeur",t:"Largeur : axial ou latéral",test:"Observer l’organisation du buste et des épaules pendant le pédalage.",
+  o:[["axial","Axial (étroit / central)","S’organise autour d’un axe central vertical virtuel, fonctionne comme une toupie. Le buste reste extrêmement fixe, stable et centré. Le pédalage est purement vertical et linéaire. Les épaules ne bougent presque pas, même à haute vélocité.",["<b>Facteur Q étroit</b> (pieds proches du cadre) et <b>cintre souvent plus étroit</b>. S’il est trop écarté, son bassin perd sa stabilité centrale et commence à « flotter » sur la selle.","<b>Avantage :</b> idéal pour les profils de vélocité, fluidité parfaite à 100 tr/min sans déperdition d’énergie latérale."]],
+     ["lateral","Large / latéral (périphérique)","S’organise à partir de deux axes verticaux parallèles (hanche-épaule gauches, hanche-épaule droites), fonctionne comme un balancier. Besoin viscéral de micro-oscillations : léger mouvement des épaules ou du haut du corps de gauche à droite pour accompagner la poussée de la jambe. Bloquer ce mouvement détruit son rendement.",["<b>Facteur Q large</b> (axes de pédales plus longs, cales poussées vers l’intérieur pour écarter les pieds), pour une plateforme stable permettant au bassin de basculer d’un appui sur l’autre.","<b>Avantage :</b> excellent pour les profils de force ou les grimpeurs qui aiment se dresser en danseuse en balançant le vélo."]]]},
+ {k:"mouvement",t:"Mouvement : dissocié ou monobloc",test:"Observer si les épaules et le bassin bougent en opposition ou restent alignés.",
+  o:[["dissocie","Dissocié (croisé)","Utilise la torsion naturelle du corps : épaules et bassin bougent en opposition (chaînes musculaires diagonales). Le haut du corps vit et accompagne le mouvement, léger balancier des épaules qui dicte le rythme des jambes. Profil type du puncheur ou du grimpeur, fluide dans les relances et en danseuse.",["<b>Cintre :</b> standard à légèrement plus large, pour libérer la cage thoracique et la micro-rotation des épaules.","<b>Potence :</b> plus longue ou ajustée, pour ne pas se sentir « compacté » et laisser les omoplates s’engager librement.","<b>Selle :</b> arrondie ou semi-arrondie, qui accompagne la micro-rotation du bassin sans points de friction.","<b>Risque si inadapté :</b> poste de pilotage trop étroit, bas ou rigide → tensions cervicales, nœuds entre les omoplates, vélocité bloquée."]],
+     ["monobloc","Monobloc (homologue / bloc)","Fonctionne comme une unité solide : épaules et bassin restent alignés et parallèles. Le haut du corps est fixe, stable, immobile ; seules les jambes tournent. Profil idéal pour le contre-la-montre ou les longs cols montés « au train ».",["<b>Cintre :</b> plus étroit (très aérodynamique), qui verrouille les épaules et compacte le bloc corporel.","<b>Potence :</b> position plus courte et compacte, pour ramener le buste vers l’axe et maximiser la rigidité des appuis avant.","<b>Selle :</b> plate et stable, impérativement, pour une base d’appui large et fixe.","<b>Risque si inadapté :</b> selle trop arrondie ou poste instable → bassin qui bouge, pertes de puissance, échauffements à l’entrejambe, compensations musculaires."]]]}
+];
+function painPos(p){const out=[];if(p.pos){out.push({view:p.pos.view,x:p.pos.x,y:p.pos.y,r:13});return out;}
+ const z=ZMAP[p.zone];if(!z||!z[2])return out;const[,,view,dx,y,r]=z;
+ const sides=dx===0?["c"]:p.cote==="Les deux"?["Droite","Gauche"]:[p.cote||"Droite"];
+ sides.forEach(s=>{let x=100;if(s!=="c"){const right=s==="Droite";x=view==="face"?(right?100-dx:100+dx):(right?100+dx:100-dx);}out.push({view,x,y,r});});
+ if(["epaule","coude","poignet","hanche"].includes(p.zone))out.slice().forEach(o=>out.push({view:"dos",x:200-o.x,y:o.y,r:o.r,ghost:1}));return out;}
+function svgMarks(view){return (cur.douleurs||[]).map((p,i)=>painPos(p).filter(o=>o.view===view).map(o=>{const c=p.type==="ant"?"ant":"cur";return `<circle class="${c}" cx="${o.x}" cy="${o.y}" r="${o.r}"/><text class="n ${c==="ant"?"a":"c"}" x="${o.x+o.r+5}" y="${o.y-o.r+2}">${i+1}</text>`}).join("")).join("");}
+function drawBodies(){$$("svg.body").forEach(s=>{s.innerHTML=SIL+svgMarks(s.dataset.view);});}
+function renderPains(){const L=cur.douleurs||[];const zo=ZONES.map(z=>`<option value="${z[0]}">${z[1]}</option>`).join("");
+ $("#painItems").innerHTML=L.length?L.map((p,i)=>`<div class="pitem ${p.type==="ant"?"ant":""}"><div class="ph"><span>${i+1}. ${p.type==="ant"?"Antécédent":"Douleur actuelle"}</span><button class="btn ghost small noprint" type="button" data-pdel="${i}">Supprimer</button></div>
+ <div class="pg"><label>Type<select data-p="${i}" data-k="type"><option value="cur">Douleur actuelle</option><option value="ant">Antécédent</option></select></label>
+ <label>Localisation<select data-p="${i}" data-k="zone">${zo}</select></label>
+ <label style="grid-column:1/-1">Pathologie (document de référence)<select data-p="${i}" data-k="patho">${pathoOptions()}</select></label><label>Côté<select data-p="${i}" data-k="cote"><option>Droite</option><option>Gauche</option><option>Les deux</option></select></label>
+ <label>Intensité (0–10)<span class="inten"><input type="range" min="0" max="10" data-p="${i}" data-k="int" value="${p.int??5}"><b id="iv${i}">${p.int??5}/10</b></span></label></div>
+ ${p.pos?'<div class="muted" style="margin-block-start:6px">Zone placée sur le schéma ('+(p.pos.view==="face"?"face":"dos")+') <button class="btn ghost small" type="button" data-punpin="'+i+'">Utiliser la localisation</button></div>':""}
+ <textarea data-p="${i}" data-k="desc" placeholder="Description : type de douleur, depuis quand, quand elle apparaît…">${esc(p.desc||"")}</textarea></div>`).join(""):'<p class="muted">Aucune douleur ni antécédent saisi.</p>';
+ L.forEach((p,i)=>{["type","zone","cote","patho"].forEach(k=>{const el=document.querySelector(`[data-p="${i}"][data-k="${k}"]`);if(el)el.value=p[k]||el.options[0].value;});});drawBodies();renderPatho();}
+function addPain(type,pos){cur.douleurs=cur.douleurs||[];const p={type,zone:pos?"autre":"genou_av",cote:"Droite",int:type==="ant"?0:5,desc:""};if(pos){p.pos=pos;p.cote=(pos.view==="face")===(pos.x<100)?"Droite":"Gauche";}cur.douleurs.push(p);renderPains();}
+function renderPM(){cur.pm=cur.pm||{};$("#pmBlocks").innerHTML=PM.map(b=>`<div class="pm"><h3>${b.t}</h3><details><summary>Protocole du test et descriptions</summary><p>${b.test}</p><ul>${b.o.map(o=>`<li><b>${o[1]} :</b> ${o[2]}</li>`).join("")}</ul></details>
+ <div class="opts">${b.o.map(o=>`<label class="${cur.pm[b.k]===o[0]?"sel":""}"><input type="radio" name="pm_${b.k}" data-pm="${b.k}" value="${o[0]}" ${cur.pm[b.k]===o[0]?"checked":""}>${o[1]}</label>`).join("")}</div>
+ <div id="reco_${b.k}"></div></div>`).join("");PM.forEach(b=>renderReco(b.k));}
+function renderReco(k){const b=PM.find(x=>x.k===k),o=b.o.find(x=>x[0]===cur.pm[k]),el=$("#reco_"+k);if(!o){el.innerHTML="";return;}el.innerHTML=`<div class="reco"><b>${o[1]}</b> — ${o[2]}${o[3].length?`<ul>${o[3].map(x=>`<li>${x}</li>`).join("")}</ul>`:""}</div>`;}
+function renderEval(){cur.douleurs=cur.douleurs||[];cur.pm=cur.pm||{};renderPains();renderPM();}
+function evalReport(){let h="";const L=cur.douleurs||[];
+ if(L.length){h+=`<h3>Douleurs et antécédents</h3><div class="bodies" style="max-width:360px"><figure><figcaption>Face</figcaption><svg class="body" viewBox="0 0 200 440">${SIL+svgMarks("face")}</svg></figure><figure><figcaption>Dos</figcaption><svg class="body" viewBox="0 0 200 440">${SIL+svgMarks("dos")}</svg></figure></div>
+ <table><thead><tr><th>N°</th><th>Type</th><th>Localisation</th><th>Côté</th><th>Intensité</th><th>Description</th></tr></thead><tbody>${L.map((p,i)=>`<tr><td>${i+1}</td><td>${p.type==="ant"?'<span class="pill na">Antécédent</span>':'<span class="pill bad">Actuelle</span>'}</td><td>${esc(ZMAP[p.zone]?ZMAP[p.zone][1]:"")}</td><td>${esc(p.cote||"")}</td><td>${p.int??"—"}/10</td><td>${esc(p.desc||"")}</td></tr>`).join("")}</tbody></table>`;}
+ const pm=cur.pm||{},sel=PM.filter(b=>pm[b.k]);
+ if(sel.length||cur.f.pm_notes){h+=`<h3>Préférences motrices</h3><table>${sel.map(b=>{const o=b.o.find(x=>x[0]===pm[b.k]);return `<tr><th style="width:25%">${b.t.split(":")[0]}</th><td><b>${o[1]}</b>${o[3].length?`<ul style="margin:4px 0 0;padding-inline-start:18px">${o[3].map(x=>`<li>${x}</li>`).join("")}</ul>`:""}</td></tr>`}).join("")}${cur.f.pm_notes?`<tr><th>Observations</th><td>${esc(cur.f.pm_notes)}</td></tr>`:""}</table>`;}
+ return h;}
+$("#addPain").addEventListener("click",()=>addPain("cur"));
+$("#addAnte").addEventListener("click",()=>addPain("ant"));
+$$("#tab-eval svg.body").forEach(s=>s.addEventListener("click",e=>{const pt=s.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=pt.matrixTransform(s.getScreenCTM().inverse());addPain("cur",{view:s.dataset.view,x:Math.round(m.x),y:Math.round(m.y)});}));
+$("#painItems").addEventListener("click",e=>{const d=e.target.dataset;if(d.pdel!=null){cur.douleurs.splice(+d.pdel,1);renderPains();}if(d.punpin!=null){delete cur.douleurs[+d.punpin].pos;renderPains();}});
+$("#painItems").addEventListener("input",e=>{const t=e.target;if(t.dataset.p==null)return;const p=cur.douleurs[+t.dataset.p],k=t.dataset.k;p[k]=k==="int"?+t.value:t.value;
+ if(k==="int"){$("#iv"+t.dataset.p).textContent=t.value+"/10";}
+ else if(k==="zone"){if(t.value!=="autre")delete p.pos;drawBodies();}
+ else if(k==="type"){renderPains();}else if(k==="patho"){const P=PMAP[t.value];if(P&&!p.pos)p.zone=P.z;renderPains();}else if(k==="cote"){drawBodies();}});
+$("#pmBlocks").addEventListener("change",e=>{const t=e.target;if(!t.dataset.pm)return;cur.pm[t.dataset.pm]=t.value;t.closest(".opts").querySelectorAll("label").forEach(l=>l.classList.toggle("sel",l.contains(t)));renderReco(t.dataset.pm);renderSelle();});
+
+const REFS={
+ bini:["Bini, Hume & Croft (2011). Effects of bicycle saddle height on knee injury risk and cycling performance. Sports Med.","https://pubmed.ncbi.nlm.nih.gov/21615188/"],
+ millour:["Millour et al. (2020). Variability of ankle kinematics in professional cyclists: consequence on saddle height adjustment. J Sci Cycling.","https://www.jsc-journal.com/index.php/JSC/article/view/541"],
+ muyor11:["Muyor, Alacid & López-Miñarro (2011). Influence of hamstring muscles extensibility on spinal curvatures and pelvic tilt in highly trained cyclists. J Hum Kinet.","https://pubmed.ncbi.nlm.nih.gov/23486997/"],
+ muyor24:["Muyor et al. (2024). Degree of hamstring extensibility and its relationship with pelvic tilt in professional cyclists. Appl Sci.","https://www.mdpi.com/2076-3417/14/9/3912"],
+ vanhoof:["Van Hoof et al. (2012). Comparing lower lumbar kinematics in cyclists with low back pain (flexion pattern) versus asymptomatic controls. Manual Therapy.","https://pure.ul.ie/en/publications/comparing-lower-lumbar-kinematics-in-cyclists-with-low-back-pain-/"],
+ burnett:["Burnett et al. (2004). Spinal kinematics and trunk muscle activity in cyclists: healthy controls vs non-specific chronic low back pain. Manual Therapy.","https://www.mskscienceandpractice.com/article/S1356-689X%2804%2900065-7/fulltext"],
+ reynolds:["Reynolds et al. (2025). The impact of minor crank length adjustments on lower body cycling kinematics. Sports Biomechanics.","https://www.tandfonline.com/doi/pdf/10.1080/14763141.2025.2511755"],
+ wadsworth:["Wadsworth & Weinrauch (2019). The role of a bike fit in cyclists with hip pain. A clinical commentary. Int J Sports Phys Ther.","https://pmc.ncbi.nlm.nih.gov/articles/PMC6818133/"],
+ fitzgibbon:["FitzGibbon, Vicenzino & Sisto (2016). Intervention at the foot-shoe-pedal interface in competitive cyclists. Int J Sports Phys Ther.","https://pmc.ncbi.nlm.nih.gov/articles/PMC4970853/"],
+ wilczynski:["Wilczyński, Zorena & Ślęzak (2020). Dynamic knee valgus in single-leg movement tasks. Int J Environ Res Public Health.","https://pubmed.ncbi.nlm.nih.gov/33172101/"],
+ fukuda:["Fukuda Stepping Test – RehabMeasures Database (seuils de Fukuda 1959 ; Bonanni & Newton 1998).","https://www.sralab.org/rehabilitation-measures/fukuda-stepping-test-unterberger-step-test"]
+};
+const MAJ=[
+ {k:"mh",t:"Mobilité haut",items:[
+  {k:"cerv_ext",l:"Extension cervicales",h:"Regarder au plafond, amplitude et confort.",imp:"Conditionne la capacité à regarder la route buste penché : plus le cintre est bas, plus l'extension cervicale demandée est forte."},
+  {k:"cerv_rot",l:"Rotations cervicales",h:"Rotation droite / gauche.",bi:1,imp:"Contrôle visuel (regarder derrière, circulation) ; une limitation se majore en position basse."},
+  {k:"thor",l:"Flexion / extension thoraciques",h:"Enroulement et redressement du haut du dos.",imp:"Un dos thoracique raide reporte la flexion sur les lombaires et l'extension sur les cervicales."},
+  {k:"epaules",l:"Rotation épaules",h:"Rotations interne / externe, mains dans le dos.",bi:1,imp:"Influence la tolérance au reach, à la largeur de cintre et aux prolongateurs."},
+  {k:"poignet",l:"Flexion poignet",h:"Flexion / extension du poignet.",bi:1,imp:"Influence l'orientation des cocottes, l'appui sur les mains et le confort en position basse."}]},
+ {k:"mb",t:"Mobilité bas",items:[
+  {k:"squat",l:"Squat complet",h:"Talons au sol, buste le plus droit possible.",imp:"Reflète la capacité de flexion globale hanche-genou-cheville au point mort haut."},
+  {k:"cheville",l:"Flexion dorsale de cheville",h:"Test genou-mur (fente).",bi:1,imp:"Influence l'angle de cheville en pédalage, donc la hauteur de selle effective et la position des cales."},
+  {k:"hanche_flex",l:"Flexion de hanche",h:"Genou vers la poitrine, sur le dos.",bi:1,imp:"Détermine l'angle de hanche fermé toléré au point mort haut (manivelles, drop, recul)."},
+  {k:"hanche_rot",l:"Rotation de hanche",h:"Rotations interne / externe, assis ou sur le ventre.",bi:1,imp:"Influence l'orientation naturelle du pied, donc la rotation des cales et la liberté angulaire."},
+  {k:"main_sol",l:"Distance main-sol",h:"Flexion avant jambes tendues.",val:"Distance (cm)",imp:"Souplesse de la chaîne postérieure (ischio-jambiers) : tolérance au drop et au reach."},
+  {k:"fessiers",l:"Étirement fessiers",h:"Figure 4 / pigeon.",bi:1,imp:"Mobilité de hanche en rotation externe et tolérance de la position fermée."}]},
+ {k:"fb",t:"Force bas",items:[
+  {k:"pointe",l:"Montée pointe de pied",h:"Unipodal, nombre de répétitions.",bi:1,val:"Répétitions",imp:"Endurance du triceps sural : conditionne la tolérance à une cale avancée (bras de levier de cheville)."},
+  {k:"single_squat",l:"Single squat",h:"Squat unipodal : contrôle du genou (valgus) et du bassin.",bi:1,imp:"Révèle un valgus dynamique et le contrôle du bassin : alignement genou-pied sur la pédale."},
+  {k:"pont1",l:"Pont fessier 1 jambe",h:"Tenue et contrôle du bassin.",bi:1,imp:"Force des fessiers et ischio-jambiers en unipodal ; stabilité du bassin sur la selle."},
+  {k:"pont2",l:"Pont fessier 2 jambes",h:"Tenue et alignement.",imp:"Force d'extension de hanche, moteur principal de la phase de poussée."},
+  {k:"fente",l:"Fente avant",h:"Stabilité, alignement genou-pied.",bi:1,imp:"Contrôle dynamique du membre inférieur et du bassin."},
+  {k:"pieds",l:"Test force des pieds",h:"Short foot / griffe des orteils, maintien de la voûte.",bi:1,imp:"Stabilité de la voûte plantaire : effondrement de l'arche, besoin de semelles ou de cales correctrices."}]},
+ {k:"fh",t:"Force haut",items:[
+  {k:"sorensen",l:"Test de Sorensen",h:"Extension du tronc en porte-à-faux (norme 100 s).",val:"Temps (s)",norm:100,imp:"Endurance des extenseurs du dos : capacité à tenir le buste penché sans s'effondrer en flexion lombaire."},
+  {k:"shirado",l:"Test de Shirado",h:"Gainage des fléchisseurs du tronc (norme 155 s).",val:"Temps (s)",norm:155,imp:"Endurance abdominale : soutien du buste, moins de poids reporté sur les mains."},
+  {k:"pompes",l:"Pompes",h:"Nombre et qualité.",val:"Répétitions",imp:"Capacité des bras et des épaules à supporter l'appui avant."},
+  {k:"deadbug",l:"Dead bug",h:"Contrôle lombo-pelvien, dos plaqué.",imp:"Contrôle du bassin et du rachis lombaire pendant que les jambes tournent."}]},
+ {k:"cf",t:"Capacités fonctionnelles",items:[
+  {k:"fukuda",l:"Test de Fukuda",h:"50 pas sur place yeux fermés, bras tendus.",fuk:1,imp:"Asymétrie de contrôle postural : rotation du bassin, appui préférentiel, à mettre en lien avec les cales et la selle."},
+  {k:"unipodal",l:"Équilibre unipodal",h:"Yeux ouverts / fermés, temps tenu.",bi:1,val:"Temps (s)",imp:"Stabilité et proprioception : tolérance à un système pédale/cale plus ou moins libre."},
+  {k:"marche",l:"Marche et appui du pied",h:"Type d'attaque et déroulé du pas.",walk:1,imp:"Renseigne sur la stratégie d'appui naturelle, à rapprocher de la position des cales."},
+  {k:"rebonds",l:"Petits rebonds",h:"Rebonds sur l'avant-pied, raideur et réactivité.",imp:"Réactivité de la cheville : cheville « ressort » ou plutôt « ancrage »."}]}
+];
+const MITEM={};MAJ.forEach(c=>c.items.forEach(i=>{MITEM[i.k]=Object.assign({cat:c.k},i);}));
+function mget(k){cur.maj=cur.maj||{};return cur.maj[k]=cur.maj[k]||{};}
+function sc(k){const v=(cur.maj||{})[k];return v&&v.s!=null&&v.s!==""?+v.s:null;}
+function catMean(c){const v=c.items.map(i=>sc(i.k)).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+function radar(labels,vals,size){size=size||300;const n=labels.length,cx=size/2,cy=size/2,R=size/2-62;let s=`<svg class="radar" viewBox="0 0 ${size} ${size}">`;
+ const P=(i,r)=>{const a=-Math.PI/2+2*Math.PI*i/n;return[cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+ for(let l=1;l<=4;l++){s+=`<polygon class="g" points="${labels.map((_,i)=>P(i,R*l/4).join(",")).join(" ")}"/>`;}
+ labels.forEach((lb,i)=>{const[x,y]=P(i,R);s+=`<line class="ax" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`;const[tx,ty]=P(i,R+14);const c=Math.cos(-Math.PI/2+2*Math.PI*i/n);const an=Math.abs(c)<0.2?"middle":c>0?"start":"end";
+  const words=lb.split(" ");let lines=[],cl="";words.forEach(w=>{if((cl+" "+w).trim().length>14&&cl){lines.push(cl);cl=w;}else cl=(cl+" "+w).trim();});lines.push(cl);
+  const dy=ty<cy-5?-(lines.length-1)*11:ty>cy+5?0:-(lines.length-1)*5.5;s+=`<text x="${tx}" y="${ty+dy}" text-anchor="${an}" dominant-baseline="middle">${lines.map((t,j)=>`<tspan x="${tx}" dy="${j?11:0}">${esc(t)}</tspan>`).join("")}</text>`;});
+ for(let l=1;l<=4;l++)s+=`<text class="lv" x="${cx+3}" y="${cy-R*l/4}" dominant-baseline="middle">${l}</text>`;
+ const pts=vals.map((v,i)=>P(i,R*(v==null?0:v)/4));s+=`<polygon class="poly" points="${pts.map(p=>p.join(",")).join(" ")}"/>`;
+ pts.forEach((p,i)=>{if(vals[i]!=null)s+=`<circle class="pt" cx="${p[0]}" cy="${p[1]}" r="3.5"/>`;});return s+"</svg>";}
+function fmtS(v){return v==null?"—":(Math.round(v*10)/10).toString().replace(".",",");}
+function renderMaj(){$("#majBlocks").innerHTML=MAJ.map(c=>`<div class="card"><h2>${c.t}</h2><div class="majgrid"><div>${c.items.map(i=>{const v=mget(i.k);return `<div class="mrow"><div class="mtop"><div class="mname">${i.l}<small>${i.h}</small></div><div class="scores">${[0,1,2,3,4].map(n=>`<button type="button" class="sb ${v.s!=null&&+v.s===n?"on":""}" data-mk="${i.k}" data-s="${n}">${n}</button>`).join("")}</div></div>
+ <div class="mextra">${i.val?`<label>${i.val}<input type="number" data-mv="${i.k}" data-f2="val" value="${v.val??""}"></label>`:""}${i.norm?`<span class="muted" id="pct_${i.k}"></span>`:""}
+ ${i.fuk?`<label>Rotation (°)<input type="number" data-mv="${i.k}" data-f2="rot" value="${v.rot??""}"></label><label>Déplacement (cm)<input type="number" data-mv="${i.k}" data-f2="dep" value="${v.dep??""}"></label><label>Sens<select data-mv="${i.k}" data-f2="sens"><option></option><option>Droite</option><option>Gauche</option></select></label>`:""}
+ ${i.walk?`<label>Attaque<select data-mv="${i.k}" data-f2="attaque"><option></option><option>Attaque talon</option><option>Médio-pied</option><option>Avant-pied</option></select></label><label>Appui<select data-mv="${i.k}" data-f2="appui"><option></option><option>Neutre</option><option>Pronateur</option><option>Supinateur</option></select></label>`:""}
+ ${i.bi?`<label>Côté<select data-mv="${i.k}" data-f2="asym"><option></option><option>Symétrique</option><option>Déficit droit</option><option>Déficit gauche</option></select></label>`:""}
+ <input class="note" type="text" placeholder="Observation" data-mv="${i.k}" data-f2="note" value="${esc(v.note||"")}"></div>
+ <details class="impact"><summary>Impact sur les réglages</summary>${i.imp}</details></div>`}).join("")}</div>
+ <div><div id="radar_${c.k}"></div><div class="catscore" id="cs_${c.k}"></div></div></div></div>`).join("");
+ $$("#majBlocks select[data-mv]").forEach(s=>{s.value=mget(s.dataset.mv)[s.dataset.f2]||"";});MAJ.forEach(c=>c.items.forEach(i=>{if(i.norm)updPct(i.k);}));updRadars();
+ if(cur.recoHtml){$("#recoBox").hidden=false;$("#recoBox").innerHTML=cur.recoHtml;}else{$("#recoBox").hidden=true;}}
+function updPct(k){const i=MITEM[k],v=mget(k),el=$("#pct_"+k);if(!el)return;const t=num(v.val);el.textContent=t==null?"":Math.round(t/i.norm*100)+" % de la norme ("+i.norm+" s)";}
+function autoScore(k){const i=MITEM[k],v=mget(k);let s=null;
+ if(i.norm){const t=num(v.val);if(t!=null){const r=t/i.norm;s=r>=1.2?4:r>=1?3:r>=0.75?2:r>=0.5?1:0;}}
+ if(i.fuk){const r=num(v.rot),d=num(v.dep);if(r!=null||d!=null){const ra=Math.abs(r||0),de=Math.abs(d||0);s=(ra<15&&de<25)?4:(ra<=30&&de<=50)?3:(ra<=45&&de<=75)?2:(ra<=60)?1:0;}}
+ if(s!=null){v.s=s;$$(`.sb[data-mk="${k}"]`).forEach(b=>b.classList.toggle("on",+b.dataset.s===s));}}
+function updRadars(){setTimeout(renderRD,0);setTimeout(renderSelle,0);setTimeout(renderAero,0);MAJ.forEach(c=>{const el=$("#radar_"+c.k);if(el)el.innerHTML=radar(c.items.map(i=>i.l),c.items.map(i=>sc(i.k)),300);const m=catMean(c);const cs=$("#cs_"+c.k);if(cs)cs.textContent=m==null?"Moyenne : —":"Moyenne : "+fmtS(m)+" / 4";});
+ $("#radarGlobal").innerHTML=radar(MAJ.map(c=>c.t),MAJ.map(catMean),340);
+ const all=MAJ.map(catMean).filter(x=>x!=null);const g=all.length?all.reduce((a,b)=>a+b,0)/all.length:null;
+ $("#globKpis").innerHTML=`<div class="kpi"><div class="v">${fmtS(g)} / 4</div><div class="l">Score global</div></div>`+MAJ.map(c=>`<div class="kpi"><div class="v">${fmtS(catMean(c))}</div><div class="l">${c.t}</div></div>`).join("");}
+function buildReco(){const G={selle:[],poste:[],manivelles:[],cales:[],asym:[],prog:[]};const used=new Set();
+ const add=(g,txt,k,refs)=>{const i=MITEM[k];refs=refs||[];refs.forEach(r=>used.add(r));G[g].push(`<li>${txt}<span class="why">Test : ${i.l} — note ${sc(k)}/4${refs.length?" · "+refs.map(r=>`<span class="ref">[${Object.keys(REFS).indexOf(r)+1}]</span>`).join(" "):" · pratique clinique"}</span></li>`);};
+ const low=k=>sc(k)!=null&&sc(k)<=1,mid=k=>sc(k)===2,lim=k=>sc(k)!=null&&sc(k)<=2,hi=k=>sc(k)===4;
+ if(lim("cerv_ext"))add("poste",`${low("cerv_ext")?"Remonter nettement":"Remonter légèrement"} le poste de pilotage (entretoises, potence à angle positif) et réduire le drop selle/cintre pour limiter l'extension cervicale prolongée.`,"cerv_ext",["muyor24"]);
+ if(low("cerv_rot"))add("poste","Privilégier une position plus relevée qui facilite le contrôle visuel latéral ; envisager un rétroviseur en usage routier.","cerv_rot");
+ if(lim("thor"))add("poste","Réduire le drop et le reach : un rachis thoracique raide reporte la flexion sur le bas du dos ; une flexion lombaire basse accrue est associée aux lombalgies du cycliste.","thor",["vanhoof","burnett"]);
+ if(lim("epaules"))add("poste","Cintre de largeur proche de la largeur d'épaules (éviter un cintre trop étroit), reach court ; prudence avec les prolongateurs.","epaules");
+ if(lim("poignet"))add("poste","Ajuster l'angle du cintre et l'orientation des cocottes pour un poignet neutre ; vérifier que la selle n'est pas inclinée vers l'avant (report de poids sur les mains).","poignet");
+ if(lim("squat"))add("manivelles","Envisager des manivelles plus courtes : une réduction même modérée de la longueur diminue la flexion de hanche et de genou au point mort haut, sans perte de puissance mesurée.","squat",["reynolds"]);
+ if(lim("hanche_flex"))add("manivelles",`${low("hanche_flex")?"Manivelles plus courtes recommandées":"Manivelles plus courtes à envisager"} pour ouvrir l'angle de hanche fermé ; remonter la selle d'autant pour conserver l'angle de genou au point mort bas, et éviter un drop trop important.`,"hanche_flex",["reynolds","wadsworth"]);
+ if(lim("cheville"))add("selle","Régler la hauteur de selle par l'angle de genou en dynamique en contrôlant aussi l'angle de cheville : l'orientation du pied modifie l'angle de genou mesuré. Éviter une selle trop haute qui forcerait une compensation en flexion plantaire.","cheville",["bini","millour"]);
+ if(lim("cheville"))add("cales","Cales plutôt reculées pour réduire la sollicitation de la cheville limitée en flexion dorsale.","cheville");
+ if(lim("hanche_rot"))add("cales","Respecter l'orientation naturelle du pied : rotation des cales adaptée et cales à liberté angulaire (float) plus importante.","hanche_rot",["wadsworth","fitzgibbon"]);
+ if(lim("main_sol"))add("poste","Chaîne postérieure peu souple : position avant moins basse et reach raisonnable. À confirmer sur le vélo : chez les cyclistes entraînés, la souplesse des ischio-jambiers n'est pas corrélée à la bascule du bassin en selle.","main_sol",["muyor11","muyor24"]);
+ if(lim("fessiers"))add("manivelles","Limiter la fermeture de hanche (recul de selle adapté, drop modéré, manivelles plus courtes si gêne fessière ou de hanche).","fessiers",["wadsworth"]);
+ if(lim("pointe"))add("cales","Cales reculées : réduire le bras de levier de cheville soulage le mollet et le tendon d'Achille.","pointe");
+ if(hi("pointe")&&hi("rebonds"))add("cales","Cheville forte et réactive : une cale centrée ou légèrement avancée est tolérable (profil « ressort »).","pointe");
+ if(lim("single_squat"))add("cales","Valgus ou mauvais contrôle du bassin en unipodal : vérifier l'alignement genou-pied sur la pédale (écartement des cales, facteur Q, semelles ou cales correctrices). Renforcer les fessiers, la flexion latérale du tronc et travailler la flexion dorsale de cheville.","single_squat",["wilczynski","fitzgibbon"]);
+ if(lim("pont1")||lim("pont2"))add("selle","Extension de hanche peu performante : éviter une selle trop haute ou trop reculée qui allonge la chaîne postérieure ; position progressive et renforcement des fessiers.",lim("pont1")?"pont1":"pont2",["bini"]);
+ if(lim("fente"))add("prog","Stabilité dynamique limitée : privilégier une position stable et progressive ; renforcement en fentes et travail unipodal.","fente",["wilczynski"]);
+ if(lim("pieds"))add("cales","Voûte peu stable : semelles avec soutien de l'arche et/ou cales ou semelles correctrices ; leur effet sur la cinématique est démontré, mais les preuves d'efficacité à long terme restent limitées.","pieds",["fitzgibbon"]);
+ if(lim("sorensen"))add("poste","Endurance des extenseurs du dos insuffisante : réduire le drop et le reach pour limiter la flexion lombaire prolongée, associée à la douleur chez les cyclistes lombalgiques.","sorensen",["vanhoof","burnett"]);
+ if(lim("shirado"))add("poste","Gainage abdominal faible : relever le poste et raccourcir le reach pour limiter le poids reporté sur les mains ; selle à niveau.","shirado");
+ if(lim("pompes"))add("poste","Appui des bras limité : reach court, poste plus haut, éviter une position allongée prolongée.","pompes");
+ if(lim("deadbug"))add("manivelles","Contrôle lombo-pelvien faible : des manivelles plus courtes réduisent l'obliquité et la rotation du bassin ; vérifier que la selle n'est pas trop haute (bascule du bassin).","deadbug",["reynolds","bini"]);
+ if(lim("fukuda")){const v=mget("fukuda");add("asym",`Fukuda perturbé${v.sens?" (rotation vers la "+v.sens.toLowerCase()+")":""} : vérifier la symétrie des cales, l'assise sur la selle et une éventuelle inégalité de longueur des jambes. Si vertiges ou troubles de l'équilibre, orienter vers un professionnel de santé (test à valeur indicative seulement).`,"fukuda",["fukuda"]);}
+ if(lim("unipodal"))add("cales","Proprioception limitée : cales offrant une liberté angulaire modérée et une plateforme d'appui stable.","unipodal");
+ {const v=mget("marche");if(v.attaque||v.appui){const t=[];if(v.attaque==="Attaque talon")t.push("Attaque talon : stratégie d'ancrage, cales plutôt reculées.");if(v.attaque==="Avant-pied")t.push("Attaque avant-pied : stratégie élastique, cales centrées ou légèrement avancées.");if(v.attaque==="Médio-pied")t.push("Attaque médio-pied : cales en position centrée.");if(v.appui==="Pronateur")t.push("Appui pronateur : soutien de voûte (semelle) à envisager.");if(v.appui==="Supinateur")t.push("Appui supinateur : vérifier l'inclinaison de l'avant-pied (cales correctrices).");if(t.length)G.cales.push(`<li>${t.join(" ")}<span class="why">Test : Marche et appui du pied${sc("marche")!=null?" — note "+sc("marche")+"/4":""} · <span class="ref">[${Object.keys(REFS).indexOf("fitzgibbon")+1}]</span></span></li>`),used.add("fitzgibbon");}}
+ if(lim("rebonds"))add("cales","Cheville peu réactive : cales plutôt reculées (plateforme d'ancrage).","rebonds");
+ const asy=Object.keys(cur.maj||{}).filter(k=>/Déficit/.test(cur.maj[k].asym||""));
+ if(asy.length){const d=asy.map(k=>MITEM[k].l+" ("+cur.maj[k].asym.toLowerCase()+")").join(", ");G.asym.push(`<li>Asymétries relevées : ${d}. Adapter le réglage côté par côté si nécessaire (rotation et position des cales, cales d'épaisseur) et cibler le renforcement ou la mobilité du côté déficitaire.<span class="why">Pratique clinique</span></li>`);}
+ const ms=MAJ.map(catMean).filter(x=>x!=null),g=ms.length?ms.reduce((a,b)=>a+b,0)/ms.length:null;
+ if(g!=null){G.prog.unshift(`<li>${g<2?"Score global faible ("+fmtS(g)+"/4) : privilégier une position confort et stable, avec des changements progressifs.":g<3?"Score global intermédiaire ("+fmtS(g)+"/4) : position équilibrée, ajustements progressifs et suivi.":g<3.5?"Bon score global ("+fmtS(g)+"/4) : la position peut rester sportive.":"Très bon score global ("+fmtS(g)+"/4) : le cycliste peut tolérer une position plus performante ou aérodynamique, à introduire progressivement."}<span class="why">Synthèse des 5 majeurs</span></li>`);}
+ const T={selle:"Selle (hauteur, recul)",poste:"Poste de pilotage (hauteur, reach, cintre)",manivelles:"Manivelles et ouverture de hanche",cales:"Cales, pieds et pédales",asym:"Asymétries",prog:"Orientation générale et préparation physique"};
+ let h=`<h2>Recommandations de réglage</h2><p class="muted">Pistes indicatives générées à partir des notes saisies et de la littérature, à confirmer par l'analyse dynamique sur le vélo. Réglez par petites étapes.</p><div class="recog">`;
+ let n=0;Object.keys(T).forEach(g=>{if(G[g].length){n++;h+=`<h3>${T[g]}</h3><ul>${G[g].join("")}</ul>`;}});
+ if(!n)h+=`<p>Aucune limitation relevée (notes de 3 ou 4) : pas de contrainte particulière issue des tests. Le réglage peut suivre les repères habituels.</p>`;
+ const refl=Object.keys(REFS);h+=`</div><h3>Sources scientifiques</h3><ol class="refs">${refl.map(r=>`<li>${esc(REFS[r][0])} <a href="${REFS[r][1]}" target="_blank" rel="noopener">Lien</a></li>`).join("")}</ol>`;
+ return h;}
+function majReport(){const any=Object.keys(cur.maj||{}).some(k=>sc(k)!=null);if(!any)return "";
+ let h=`<h3>Les 5 majeurs</h3><div class="majglob"><div>${radar(MAJ.map(c=>c.t),MAJ.map(catMean),320)}</div><table><tbody>${MAJ.map(c=>`<tr><th>${c.t}</th><td>${fmtS(catMean(c))} / 4</td></tr>`).join("")}</tbody></table></div>`;
+ h+=`<table><thead><tr><th>Catégorie</th><th>Exercice</th><th>Note</th><th>Détails</th></tr></thead><tbody>${MAJ.map(c=>c.items.filter(i=>sc(i.k)!=null).map(i=>{const v=mget(i.k);const d=[v.val&&(i.val+" : "+v.val),v.rot&&("rotation "+v.rot+"°"),v.dep&&("déplacement "+v.dep+" cm"),v.sens,v.attaque,v.appui,v.asym,v.note].filter(Boolean).join(" · ");return `<tr><td>${c.t}</td><td>${i.l}</td><td>${sc(i.k)}/4</td><td>${esc(d)}</td></tr>`}).join("")).join("")}</tbody></table>`;
+ if(cur.recoHtml)h+=`<div class="report-reco">${cur.recoHtml.replace("<h2>","<h3>").replace("</h2>","</h3>")}</div>`;return h;}
+$("#majBlocks").addEventListener("click",e=>{const b=e.target.closest(".sb");if(!b)return;const v=mget(b.dataset.mk),n=+b.dataset.s;v.s=(v.s!=null&&+v.s===n)?null:n;$$(`.sb[data-mk="${b.dataset.mk}"]`).forEach(x=>x.classList.toggle("on",v.s!=null&&+x.dataset.s===v.s));updRadars();});
+$("#majBlocks").addEventListener("input",e=>{const t=e.target;if(!t.dataset.mv)return;const k=t.dataset.mv;mget(k)[t.dataset.f2]=t.value;if(["val","rot","dep"].includes(t.dataset.f2)){if(MITEM[k].norm)updPct(k);autoScore(k);updRadars();}});
+$("#btnReco").addEventListener("click",()=>{cur.recoHtml=buildReco();const b=$("#recoBox");b.innerHTML=cur.recoHtml;b.hidden=false;b.scrollIntoView({behavior:"smooth"});});
+
+const COTES=[["c1","Repère d'assise sur la selle (distance depuis le nez de selle)","mm",["repère plus en arrière","repère plus en avant"]],
+ ["c2","Hauteur de selle : axe de pédalier → repère de selle","mm",["selle remontée","selle abaissée"]],
+ ["c3","Recul de selle : verticale de l'axe de pédalier → repère de selle","mm",["selle reculée","selle avancée"]],
+ ["c4","Repère de selle → axe de pédale (manivelle dans l'axe du tube)","mm",["distance selle-pédale allongée","distance selle-pédale raccourcie"]],
+ ["c5","Nez de selle → cintre","mm",["poste allongé","poste raccourci"]],
+ ["c6","Repère de selle → centre du collier de potence","mm",["reach allongé","reach raccourci"]],
+ ["c7","Inclinaison de la selle (positif = nez relevé)","°",["nez de selle relevé","nez de selle abaissé"]]];
+const COMP=[],AUTRES=[];
+const BIKE_IN={c1:[160,80],c2:[358,300],c3:[300,40],c4:[492,360],c5:[555,105],c6:[512,220],c7:[868,108]};
+function bikeSVG(){const b=(x,y,n)=>`<circle class="bub" cx="${x}" cy="${y}" r="15"/><text x="${x}" y="${y}">${n}</text>`;
+ return `<svg class="bike" viewBox="0 0 1000 640" role="img" aria-label="Schéma des cotes du vélo">
+ <circle class="wheel" cx="200" cy="470" r="168"/><circle class="thin" cx="200" cy="470" r="150"/><circle class="wheel" cx="740" cy="470" r="168"/><circle class="thin" cx="740" cy="470" r="150"/>
+ <circle class="thin" cx="420" cy="510" r="45"/>
+ <path class="tube" d="M420 510 L345 235 L630 222 M650 290 L420 510 M420 510 L200 470 L345 235 M345 235 L320 150"/>
+ <path class="tube" d="M628 205 L655 300 Q690 400 740 470"/>
+ <path class="tube" style="stroke-width:8" d="M628 205 L690 212 Q748 208 748 245 Q748 290 708 296"/>
+ <path class="tube" style="stroke-width:9" d="M420 510 L447 612"/><rect class="part" x="425" y="606" width="46" height="10" rx="3"/>
+ <path class="part" d="M245 122 Q236 142 268 144 L392 136 Q406 131 398 124 Q330 110 245 122Z"/>
+ <path class="dash" d="M305 124 L305 52 M420 510 L420 52 M398 126 L398 40"/>
+ <path class="cote" d="M305 62 L420 62"/><path class="cote" d="M398 46 L420 46" style="stroke-width:2"/>
+ <text class="lbl" x="430" y="42">UCI</text><text class="lbl" x="430" y="64">consensus</text>
+ <path class="cote" d="M420 510 L305 124"/><path class="cote" d="M312 118 L455 606"/><path class="cote" d="M405 110 L628 172"/><path class="dash" d="M628 172 L628 205"/>
+ <path class="cote" d="M305 124 L690 212"/>
+ <circle class="dot" cx="305" cy="124" r="6"/><circle class="dot" cx="398" cy="126" r="5"/><circle class="dot" cx="420" cy="510" r="6"/><circle class="dot" cx="448" cy="611" r="6"/><circle class="dot" cx="690" cy="212" r="6"/><circle class="dot" cx="628" cy="205" r="5"/>
+ <text class="lbl" x="472" y="630">axe de pédale</text><text class="lbl" x="762" y="214">centre du collier</text>
+ <rect x="770" y="18" width="215" height="125" rx="10" fill="none" stroke="#c9ced5"/>
+ <path class="part" d="M790 92 Q782 112 815 114 L955 128 Q965 126 958 120 Q880 96 790 92Z"/>
+ <path class="dash" d="M790 92 L975 92"/><path class="cote" d="M790 92 L965 130" style="stroke-width:2"/><path class="dash" d="M935 92 Q942 106 938 122"/>
+ <text class="lbl" x="782" y="134">zoom sur la selle</text>
+ ${b(150,124,1)}${b(330,300,2)}${b(272,62,3)}${b(470,360,4)}${b(530,105,5)}${b(488,220,6)}${b(940,45,7)}</svg>`;}
+function rv(k,w){const v=(cur.regl||{})[k];return v?num(v[w]):null;}
+function dfmt(k,unit,interp){const a=rv(k,"av"),b=rv(k,"ap");if(a==null||b==null)return {t:"—",c:""};const d=Math.round((b-a)*10)/10;if(d===0)return {t:"0 "+unit+" (inchangé)",c:""};
+ return {t:(d>0?"+":"")+d.toString().replace(".",",")+" "+unit+(interp?" — "+interp[d>0?0:1]:""),c:d>0?"pos":"neg"};}
+function renderBikes(){cur.regl=cur.regl||{};$$(".bikebox").forEach(box=>{const w=box.dataset.w;box.innerHTML=bikeSVG()+COTES.map(([k,l,u])=>{const[x,y]=BIKE_IN[k];const v=(cur.regl[k]||{})[w];return `<input type="number" step="0.5" data-g="${k}" data-w="${w}" placeholder="${u}" title="${l}" style="left:${x/10}%;top:${y/6.4}%" value="${v??""}">`;}).join("");});}
+function rowsTable(list,withInputs){return list.map(([k,l,u])=>{const v=(cur.regl||{})[k]||{};const d=dfmt(k,u);return `<tr><td>${l}${u?` <span class="muted">(${u})</span>`:""}</td><td><input type="number" step="0.5" data-g="${k}" data-w="av" value="${v.av??""}"></td><td><input type="number" step="0.5" data-g="${k}" data-w="ap" value="${v.ap??""}"></td><td id="d_${k}" class="delta ${d.c}">${d.t}</td></tr>`}).join("");}
+function renderRegl(){renderBikes();$$('input[data-g="kops"]').forEach(i=>{i.value=((cur.regl||{}).kops||{})[i.dataset.w]??"";});updDelta();}
+function updDelta(){setTimeout(updKops,0);$("#cotesBody").innerHTML=COTES.map(([k,l,u,it],i)=>{const d=dfmt(k,u,it);const f=w=>{const x=rv(k,w);return x==null?"—":x.toString().replace(".",",")+" "+u;};return `<tr><td><b>${i+1}</b></td><td>${l}</td><td>${f("av")}</td><td>${f("ap")}</td><td class="delta ${d.c}">${d.t}</td></tr>`;}).join("");
+ [...COMP,...AUTRES].forEach(([k,l,u])=>{const el=document.getElementById("d_"+k);if(!el)return;const d=dfmt(k,u);el.textContent=d.t;el.className="delta "+d.c;});}
+function posReport(){const has=list=>list.filter(([k])=>rv(k,"av")!=null||rv(k,"ap")!=null);let h="";
+ const tb=(title,list,num1)=>{const r=has(list);if(!r.length)return "";return `<h3>${title}</h3><table><thead><tr>${num1?"<th>N°</th>":""}<th>Cote</th><th>Avant</th><th>Après</th><th>Différence</th></tr></thead><tbody>${r.map(([k,l,u,it])=>{const d=dfmt(k,u,it);const f=w=>{const x=rv(k,w);return x==null?"—":x+" "+u;};return `<tr>${num1?`<td>${COTES.findIndex(c=>c[0]===k)+1}</td>`:""}<td>${l}</td><td>${f("av")}</td><td>${f("ap")}</td><td>${d.t}</td></tr>`}).join("")}</tbody></table>`;};
+ if(has(COTES).length)h+=`<h3>Position — prises de cotes</h3><div style="max-width:520px">${bikeSVG()}</div>`;
+ h+=tb("Cotes avant / après",COTES,1).replace("<h3>Cotes avant / après</h3>","");const cf=cur.f;if(cf.comp_cintre||cf.comp_potence||cf.comp_manivelles)h+=`<h3>Composants</h3><table>${[["Cintre",cf.comp_cintre],["Potence",cf.comp_potence],["Manivelles",cf.comp_manivelles]].filter(x=>x[1]).map(x=>`<tr><th style="width:35%">${x[0]}</th><td>${esc(x[1])}</td></tr>`).join("")}</table>`;return h;}
+/* ---------- Photos ---------- */
+const JP=[["pied","Pied"],["cheville","Cheville"],["genou","Genou"],["hanche","Hanche"],["epaule","Épaule"],["coude","Coude"],["poignet","Poignet"]];
+const PH_ANG=[["cheville","Cheville (jambe / pied)"],["genou","Genou (angle relatif)"],["hanche","Hanche (angle relatif)"],["epaule","Angle d'épaule (tronc / bras)"],["coude","Flexion du coude"],["dos","Angle du dos / horizontale"]];
+const placing={av:null,ap:null};
+function ang3(a,b,c){const v1=[a[0]-b[0],a[1]-b[1]],v2=[c[0]-b[0],c[1]-b[1]];const d=Math.hypot(...v1)*Math.hypot(...v2);if(!d)return null;return Math.acos(Math.max(-1,Math.min(1,(v1[0]*v2[0]+v1[1]*v2[1])/d)))*180/Math.PI;}
+function photoAngles(w){const P=((cur.photos||{})[w]||{}).pts||{};const ok=(...k)=>k.every(x=>P[x]);const r={};
+ if(ok("genou","cheville","pied"))r.cheville=ang3(P.genou,P.cheville,P.pied);
+ if(ok("hanche","genou","cheville"))r.genou=180-ang3(P.hanche,P.genou,P.cheville);
+ if(ok("epaule","hanche","genou"))r.hanche=180-ang3(P.epaule,P.hanche,P.genou);
+ if(ok("hanche","epaule","coude"))r.epaule=ang3(P.hanche,P.epaule,P.coude);
+ if(ok("epaule","coude","poignet"))r.coude=180-ang3(P.epaule,P.coude,P.poignet);
+ if(ok("hanche","epaule")){const dx=Math.abs(P.epaule[0]-P.hanche[0]),dy=P.hanche[1]-P.epaule[1];r.dos=Math.atan2(dy,dx)*180/Math.PI;}
+ Object.keys(r).forEach(k=>{if(r[k]!=null)r[k]=Math.round(r[k]);});return r;}
+function overlay(w,interactive){const ph=cur.photos[w],P=ph.pts||{};const sw=Math.max(ph.w,ph.h)/250;const ch=["pied","cheville","genou","hanche","epaule","coude","poignet"];let s="";
+ for(let i=0;i<ch.length-1;i++){if(P[ch[i]]&&P[ch[i+1]])s+=`<line class="sk" style="stroke-width:${sw}" x1="${P[ch[i]][0]}" y1="${P[ch[i]][1]}" x2="${P[ch[i+1]][0]}" y2="${P[ch[i+1]][1]}"/>`;}
+ const A=photoAngles(w);const lab={cheville:"cheville",genou:"genou",hanche:"hanche",epaule:"epaule",coude:"coude"};
+ JP.forEach(([k])=>{if(P[k]){s+=`<circle class="jp" data-jp="${k}" data-w="${w}" cx="${P[k][0]}" cy="${P[k][1]}" r="${sw*2.2}" style="stroke-width:${sw/1.5}"/>`;if(A[k]!=null&&lab[k])s+=`<text x="${P[k][0]+sw*4}" y="${P[k][1]-sw*2}" style="font-size:${sw*7}px;stroke-width:${sw*1.2}px">${A[k]}°</text>`;}});
+ return `<svg viewBox="0 0 ${ph.w} ${ph.h}" data-ov="${w}" class="${interactive&&placing[w]!=null?"placing":""}">${s}</svg>`;}
+function renderPhoto(w){cur.photos=cur.photos||{};const col=document.querySelector(`.phcol[data-w="${w}"]`);if(!col)return;const ph=cur.photos[w];const t=w==="av"?"Photo avant":"Photo après";
+ col.innerHTML=`<h3>${t}</h3>${ph&&ph.img?`<div class="phwrap"><img src="${ph.img}" alt="${t}">${overlay(w,true)}</div>`:`<div class="phdrop">Aucune photo</div>`}
+ <div class="phstatus" id="phs_${w}">${placing[w]!=null?"Cliquez sur : <b>"+JP[placing[w]][1]+"</b>":""}</div>
+ <div class="phbtns noprint"><span class="btn small filebtn">${ph&&ph.img?"Changer la photo":"Ajouter une photo"}<input type="file" accept="image/*" data-phfile="${w}"></span>
+ ${ph&&ph.img?`<button class="btn small" type="button" data-phauto="${w}">Détection automatique</button><button class="btn ghost small" type="button" data-phman="${w}">Placer les points</button><button class="btn ghost small" type="button" data-phclr="${w}">Effacer les points</button>`:""}</div>`;}
+function renderPhotoTable(){setTimeout(updStatus,0);const a=photoAngles("av"),b=photoAngles("ap");$("#photoAngBody").innerHTML=PH_ANG.map(([k,l])=>{const x=a[k],y=b[k];const d=x!=null&&y!=null?y-x:null;return `<tr><td>${l}</td><td>${x!=null?x+"°":"—"}</td><td>${y!=null?y+"°":"—"}</td><td class="delta ${d>0?"pos":d<0?"neg":""}">${d==null?"—":(d>0?"+":"")+d+"°"}</td></tr>`;}).join("");}
+function renderPhotos(){renderPhoto("av");renderPhoto("ap");renderPhotoTable();}
+function refreshOverlay(w){const o=document.querySelector(`svg[data-ov="${w}"]`);if(o)o.outerHTML=overlay(w,true);const st=$("#phs_"+w);if(st)st.innerHTML=placing[w]!=null?"Cliquez sur : <b>"+JP[placing[w]][1]+"</b>":"";renderPhotoTable();}
+function svgPt(svg,e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=pt.matrixTransform(svg.getScreenCTM().inverse());return[Math.round(m.x),Math.round(m.y)];}
+function loadPhoto(w,file){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const M=1400,sc=Math.min(1,M/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+ cur.photos[w]={img:c.toDataURL("image/jpeg",0.85),w:c.width,h:c.height,pts:{}};placing[w]=null;renderPhoto(w);renderPhotoTable();};im.src=fr.result;};fr.readAsDataURL(file);}
+let poseModel=null;
+async function autoDetect(w){const st=$("#phs_"+w);st.textContent="Analyse de la photo en cours…";
+ try{if(!poseModel){const base="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";const mp=await import(base+"/vision_bundle.mjs");const fs=await mp.FilesetResolver.forVisionTasks(base+"/wasm");
+   poseModel=await mp.PoseLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task"},runningMode:"IMAGE",numPoses:1});}
+  const im=new Image();im.src=cur.photos[w].img;await im.decode();const r=poseModel.detect(im);const lm=r&&r.landmarks&&r.landmarks[0];if(!lm)throw new Error("none");
+  const L=[31,27,25,23,11,13,15],R=[32,28,26,24,12,14,16];const vis=a=>a.reduce((s,i)=>s+(lm[i].visibility||0),0);const S=vis(L)>=vis(R)?L:R;
+  const P={};JP.forEach(([k],i)=>{P[k]=[Math.round(lm[S[i]].x*cur.photos[w].w),Math.round(lm[S[i]].y*cur.photos[w].h)];});cur.photos[w].pts=P;placing[w]=null;refreshOverlay(w);
+  $("#phs_"+w).textContent="Points détectés : vérifiez-les et déplacez-les si besoin.";}
+ catch(err){st.textContent="Détection automatique indisponible ici : placez les points avec « Placer les points ».";}}
+$(".photos").addEventListener("change",e=>{const w=e.target.dataset.phfile;if(w&&e.target.files[0])loadPhoto(w,e.target.files[0]);});
+$(".photos").addEventListener("click",e=>{const d=e.target.dataset;
+ if(d.phauto)autoDetect(d.phauto);
+ else if(d.phman){cur.photos[d.phman].pts={};placing[d.phman]=0;refreshOverlay(d.phman);}
+ else if(d.phclr){cur.photos[d.phclr].pts={};placing[d.phclr]=null;refreshOverlay(d.phclr);}
+ else{const svg=e.target.closest("svg[data-ov]");if(!svg)return;const w=svg.dataset.ov;if(placing[w]==null)return;cur.photos[w].pts[JP[placing[w]][0]]=svgPt(svg,e);placing[w]=placing[w]+1<JP.length?placing[w]+1:null;refreshOverlay(w);}});
+let drag=null;
+$(".photos").addEventListener("pointerdown",e=>{const c=e.target.closest("circle[data-jp]");if(!c||placing[c.dataset.w]!=null)return;drag={w:c.dataset.w,k:c.dataset.jp};e.preventDefault();});
+window.addEventListener("pointermove",e=>{if(!drag)return;const svg=document.querySelector(`svg[data-ov="${drag.w}"]`);if(!svg)return;cur.photos[drag.w].pts[drag.k]=svgPt(svg,e);refreshOverlay(drag.w);});
+window.addEventListener("pointerup",()=>{drag=null;});
+function photoReport(){const has=w=>cur.photos&&cur.photos[w]&&cur.photos[w].img;if(!has("av")&&!has("ap"))return "";const a=photoAngles("av"),b=photoAngles("ap");
+ return `<h3>Analyse photo avant / après</h3><div class="photos">${["av","ap"].filter(has).map(w=>`<div><b>${w==="av"?"Avant":"Après"}</b><div class="phwrap"><img src="${cur.photos[w].img}" alt="">${overlay(w,false)}</div></div>`).join("")}</div>
+ <table><thead><tr><th>Articulation</th><th>Avant</th><th>Après</th><th>Différence</th></tr></thead><tbody>${PH_ANG.map(([k,l])=>{const x=a[k],y=b[k];if(x==null&&y==null)return "";const d=x!=null&&y!=null?y-x:null;return `<tr><td>${l}</td><td>${x!=null?x+"°":"—"}</td><td>${y!=null?y+"°":"—"}</td><td>${d==null?"—":(d>0?"+":"")+d+"°"}</td></tr>`}).join("")}</tbody></table>`;}
+
+const CL_SC=2.2;
+function soleSVG(p,v){v=v||{};const R=p==="d";const av=num(v.av)||0,lat=num(v.lat)||0,rot=num(v.rot)||0;
+ const cx=130,cy=150;const dx=(R?1:-1)*lat*CL_SC,dy=-av*CL_SC,ra=(R?1:-1)*rot;
+ const sole="M130 22 C172 22 196 60 198 112 C200 160 186 196 176 236 C166 280 172 330 168 372 C164 410 146 430 122 430 C98 430 84 410 84 372 C82 330 82 290 76 250 C68 200 60 160 62 112 C64 60 88 22 130 22Z";
+ const cleat="M0 -46 C26 -46 36 -30 36 -10 L30 34 C28 44 20 48 0 48 C-20 48 -28 44 -30 34 L-36 -10 C-36 -30 -26 -46 0 -46Z";
+ const tf=R?"":`transform="translate(260 0) scale(-1 1)"`;
+ return `<svg class="sole" viewBox="0 0 260 450" role="img" aria-label="Semelle ${R?"droite":"gauche"}">
+ <g ${tf}><path class="sl" d="${sole}"/></g>
+ <line class="rax" x1="${cx}" y1="70" x2="${cx}" y2="240"/><line class="rax" x1="70" y1="${cy}" x2="190" y2="${cy}"/>
+ <path class="ref" transform="translate(${cx} ${cy})" d="${cleat}"/>
+ <g transform="translate(${cx+dx} ${cy+dy}) rotate(${ra})"><path class="cl" d="${cleat}"/><line class="ax" x1="0" y1="-40" x2="0" y2="42"/><line class="ax" x1="-18" y1="0" x2="18" y2="0"/></g>
+ <text x="${R?250:10}" y="300" text-anchor="${R?"end":"start"}">Intérieur</text><text x="${R?10:250}" y="300" text-anchor="${R?"start":"end"}">Extérieur</text>
+ <text x="130" y="14" text-anchor="middle">Orteils</text><text x="130" y="446" text-anchor="middle">Talon</text></svg>`;}
+function calSum(v){v=v||{};const av=num(v.av),lat=num(v.lat),rot=num(v.rot);const t=[];
+ if(av)t.push(Math.abs(av)+" mm "+(av>0?"avancée":"reculée"));if(lat)t.push(Math.abs(lat)+" mm vers l'"+(lat>0?"intérieur":"extérieur"));if(rot)t.push(Math.abs(rot)+"° vers l'"+(rot>0?"intérieur":"extérieur"));
+ return t.length?"Cale "+t.join(", "):(av===0||lat===0||rot===0||av==null&&lat==null&&rot==null?"Cale en position de référence":"");}
+function renderCales(){cur.cales=cur.cales||{g:{},d:{}};$$(".shoe").forEach(el=>{const p=el.dataset.p,v=cur.cales[p]=cur.cales[p]||{};
+ el.innerHTML=`<h3>Pied ${p==="g"?"gauche":"droit"}</h3><div class="svgw">${soleSVG(p,v)}</div>
+ <div class="cin"><label>Avancée / recul (mm)<input type="number" step="0.5" data-cp="${p}" data-ck="av" value="${v.av??""}"></label>
+ <label>Latéral (mm)<input type="number" step="0.5" data-cp="${p}" data-ck="lat" value="${v.lat??""}"></label>
+ <label>Rotation (°)<input type="number" step="0.5" data-cp="${p}" data-ck="rot" value="${v.rot??""}"></label></div>
+ <div class="csum">${calSum(v)}</div>`;});}
+$(".shoes").addEventListener("input",e=>{const t=e.target;if(!t.dataset.cp)return;const p=t.dataset.cp;cur.cales[p][t.dataset.ck]=t.value;const el=document.querySelector(`.shoe[data-p="${p}"]`);el.querySelector(".svgw").innerHTML=soleSVG(p,cur.cales[p]);el.querySelector(".csum").textContent=calSum(cur.cales[p]);});
+function calesReport(){const c=cur.cales||{};const has=p=>c[p]&&["av","lat","rot"].some(k=>c[p][k]!==undefined&&c[p][k]!=="");if(!has("g")&&!has("d")&&!cur.f.cales_notes)return "";
+ const f=(p,k,u)=>c[p]&&c[p][k]!==undefined&&c[p][k]!==""?(num(c[p][k])>0?"+":"")+c[p][k]+" "+u:"—";
+ return `<h3>Position des cales</h3><div class="shoes" style="max-width:520px">${["g","d"].map(p=>`<div><b>Pied ${p==="g"?"gauche":"droit"}</b>${soleSVG(p,c[p])}</div>`).join("")}</div>
+ <table><thead><tr><th>Pied</th><th>Avancée / recul</th><th>Latéral</th><th>Rotation</th></tr></thead><tbody>${["g","d"].map(p=>`<tr><td>${p==="g"?"Gauche":"Droit"}</td><td>${f(p,"av","mm")}</td><td>${f(p,"lat","mm")}</td><td>${f(p,"rot","°")}</td></tr>`).join("")}</tbody></table>
+ ${cur.f.cales_notes?`<p>${esc(cur.f.cales_notes)}</p>`:""}`;}
+
+const ANGLES=[["cheville","Cheville","cheville","96 ± 6° · maximum non pathologique : 20° de flexion plantaire","plus ouverte (talon plus haut)","plus fermée"],
+ ["genou","Genou (angle relatif)","genou","33 à 43° (soit 137 à 147° en angle absolu)","plus fléchi (selle plus basse)","plus tendu (selle plus haute)"],
+ ["hanche","Hanche (angle relatif)","hanche","42 ± 10°","plus fermée","plus ouverte"],
+ ["dos","Dos / horizontale","dos","Flexion lombaire et extension cervicale confortables, buste incliné entre 45 et 55°","buste plus redressé","buste plus incliné"],
+ ["epaule","Épaule (tronc / bras)","epaule","90° en chrono, dégressif avec l'engagement de la position","bras plus engagés (poste plus long / bas)","bras moins engagés (poste plus court / haut)"],
+ ["coude","Coude (flexion)","coude","Légèrement fléchis","coudes plus fléchis","coudes plus tendus"]];
+function lv(k){const s=sc(k);return s==null?0:s<=1?1:s===2?0.5:0;}
+function pain(z){return (cur.douleurs||[]).some(p=>p.type!=="ant"&&z.includes(p.zone));}
+function angAdjust(k){const out={d:0,why:[]};const pm=cur.pm||{},disc=cur.f.discipline;
+ const A=(v,txt)=>{if(v){out.d+=v;out.why.push((v>0?"↑ ":"↓ ")+txt);}};
+ const L=(key,w,txt)=>{const x=lv(key);if(x)A(w*x,`${txt} (${MITEM[key].l.toLowerCase()} ${sc(key)}/4)`);};
+ const ms=MAJ.map(catMean).filter(x=>x!=null),g=ms.length?ms.reduce((a,b)=>a+b,0)/ms.length:null;
+ const top=g!=null&&g>=3.5&&!Object.keys(cur.maj||{}).some(x=>sc(x)!=null&&sc(x)<=2);
+ if(k==="cheville"){if(pm.profil==="aerien")A(2,"Profil aérien : cheville « ressort », plus de flexion plantaire");if(pm.profil==="terrien")A(-2,"Profil terrien : pied en plateforme d'ancrage");L("pointe",-1,"Mollet peu endurant");if(pain(["achille","mollet"]))A(-2,"Douleur mollet / tendon d'Achille actuelle");if(patho("achille"))A(-1,"Tendinite d'Achille : cales reculées, cheville moins sollicitée");if(sc("rebonds")===4)A(1,"Cheville très réactive (petits rebonds 4/4)");L("cheville",1,"Flexion dorsale limitée");}
+ if(k==="genou"){L("cheville",1,"Flexion dorsale limitée");L("main_sol",1,"Chaîne postérieure peu souple");L("deadbug",1,"Contrôle du bassin limité : éviter une selle haute");if(pain(["genou_ar","ischio"]))A(2,"Douleur arrière du genou / ischios actuelle");if(pain(["lombaires"]))A(1,"Lombalgie : une selle trop haute fait basculer le bassin");if(pain(["genou_av"]))A(-2,"Douleur avant du genou : une selle basse augmente la compression rotulienne");if(patho("fp"))A(-1,"Syndrome fémoro-patellaire : remonter la selle (réglage principal)");if(patho("bit"))A(1.5,"Bandelette ilio-tibiale : un léger abaissement de selle diminue la charge");if(patho("genou_ar"))A(1,"Arrière du genou / ischio-jambiers : abaisser la selle");if(patho("achille"))A(1,"Tendinite d'Achille : abaisser légèrement la selle");if(patho("piriforme"))A(0.5,"Piriforme / moyen fessier : éviter le déhanchement (selle pas trop haute)");if(pm.profil==="aerien")A(-1,"Profil aérien");if(pm.profil==="terrien")A(1,"Profil terrien");}
+ if(k==="hanche"){L("hanche_flex",-2,"Flexion de hanche limitée");L("squat",-1,"Squat limité");L("fessiers",-1,"Fessiers raides");L("sorensen",-1,"Extenseurs du dos peu endurants");if(pain(["lombaires","hanche","fessier","perinee"]))A(-2,"Douleur lombaire, de hanche ou périnéale actuelle");if(pm.mouvement==="monobloc")A(1,"Profil monobloc : position compacte tolérée");if(pm.mouvement==="dissocie")A(-1,"Profil dissocié : besoin d'espace");if(top)A(1,"Très bon bilan des 5 majeurs");}
+ if(k==="dos"){L("thor",2,"Rachis thoracique raide");L("sorensen",2,"Extenseurs du dos peu endurants");L("shirado",1,"Gainage abdominal faible");L("cerv_ext",2,"Extension cervicale limitée");L("main_sol",1,"Chaîne postérieure peu souple");if(pain(["nuque","lombaires","omoplates","trapeze"]))A(2,"Douleur rachidienne actuelle");if(pm.mouvement==="monobloc")A(-1,"Profil monobloc");if(top)A(-1,"Très bon bilan des 5 majeurs");
+  if(disc==="route_sport")A(-1,"Pratique route performance");if(isAero()){const ae=aeroEval().ok;if(ae==="vert")A(-2,"Objectif aéro, bilan favorable");else if(ae==="orange")A(-1,"Objectif aéro, abaissement progressif");}if(disc==="clm")A(-2,"Pratique chrono / triathlon");if(disc==="urbain")A(2,"Pratique urbaine");if(disc==="vtt")A(1,"Pratique VTT");}
+ if(k==="epaule"){L("epaules",-2,"Mobilité d'épaule limitée");L("pompes",-1,"Appui des bras limité");L("cerv_ext",-1,"Extension cervicale limitée");if(pain(["epaule","trapeze"]))A(-2,"Douleur d'épaule / trapèze actuelle");if(pain(["nuque"]))A(-1,"Douleur cervicale actuelle");if(pm.mouvement==="dissocie")A(1,"Profil dissocié : potence plus longue");if(pm.mouvement==="monobloc")A(-1,"Profil monobloc : poste plus court");
+  if(disc==="clm")A(2,"Pratique chrono");if(disc==="route_sport")A(1,"Pratique route performance");if(isAero()){const ae=aeroEval().ok;if(ae==="vert")A(2,"Objectif aéro, bilan favorable");else if(ae==="orange")A(1,"Objectif aéro, abaissement progressif");}if(disc==="urbain")A(-2,"Pratique urbaine");}
+ if(k==="coude"){if(pain(["poignet","coude","epaule","nuque"]))A(2,"Douleur cervicale ou du membre supérieur : amortir avec les coudes");L("poignet",1,"Poignets peu mobiles");if(pm.largeur==="lateral")A(1,"Profil latéral : balancier du buste");if(pm.largeur==="axial")A(-1,"Profil axial : buste fixe");}
+ return out;}
+const ZONE_T={bas:"Bas de fourchette",milieu:"Milieu de fourchette",haut:"Haut de fourchette"};
+function recRange(k){const b=ranges()[k];const a=angAdjust(k);const z=a.d<=-1.5?"bas":a.d>=1.5?"haut":"milieu";const w=(b[1]-b[0])/3;
+ const t=z==="bas"?[b[0],b[0]+w]:z==="haut"?[b[1]-w,b[1]]:[b[0]+w,b[1]-w];return {base:b,adj:a,zone:z,rec:t.map(Math.round)};}
+function measured(k,w){const v=photoAngles(w)[ANGLES.find(x=>x[0]===k)[2]];return v==null?null:v;}
+function tStatus(v,R){if(v==null)return '<span class="muted">—</span>';const[a,b]=R.base;if(v<a||v>b)return v+'° <span class="pill bad">Hors fourchette</span>';if(v>=R.rec[0]&&v<=R.rec[1])return v+'° <span class="pill ok">Dans la cible</span>';return v+'° <span class="pill warn">'+(v<R.rec[0]?"Sous la cible":"Au-dessus de la cible")+'</span>';}
+function zonePill(R){return `<span class="pill ${R.zone==="milieu"?"na":"warn"}">${ZONE_T[R.zone]}</span><div style="font-weight:700;margin-block-start:3px">${R.rec[0]}–${R.rec[1]}°</div>`;}
+function renderAngles(){const r=ranges();$("#anglesBody").innerHTML=ANGLES.map(([k,l,,ref])=>{const b=r[k];return `<tr><td><b>${l}</b><div class="muted" style="font-size:11.5px">${esc(ref)}</div><div id="w_${k}" style="font-size:12px;margin-block-start:4px"></div></td><td class="rng"><input data-r="${k}" data-i="0" type="number" value="${b[0]}"> – <input data-r="${k}" data-i="1" type="number" value="${b[1]}"></td><td id="rec_${k}"></td><td id="m_${k}_av"></td><td id="m_${k}_ap"></td></tr>`}).join("");updStatus();}
+function updStatus(){if(!$("#anglesBody"))return;ANGLES.forEach(([k,,,,hi,lo])=>{const R=recRange(k);const e=id=>document.getElementById(id);if(!e("rec_"+k))return;
+ e("rec_"+k).innerHTML=zonePill(R);
+ e("w_"+k).innerHTML=R.adj.why.length?`<span class="muted">Viser ${R.zone==="haut"?hi:R.zone==="bas"?lo:"une valeur centrale"} :</span><br>`+R.adj.why.map(esc).join("<br>"):'<span class="muted">Aucun élément du bilan ne fait pencher : viser le milieu.</span>';
+ ["av","ap"].forEach(w=>{e(`m_${k}_${w}`).innerHTML=tStatus(measured(k,w),R);});});}
+function angleReport(){const any=Object.keys(cur.maj||{}).length||Object.keys(cur.pm||{}).length||(cur.photos&&(cur.photos.av||cur.photos.ap));if(!any)return "";
+ return `<h3>Fourchettes d'angles conseillées (pédale au point le plus bas)</h3><table><thead><tr><th>Articulation</th><th>Référence</th><th>Cible</th><th>Avant</th><th>Après</th></tr></thead><tbody>${ANGLES.map(([k,l])=>{const R=recRange(k);return `<tr><td>${l}${R.adj.why.length?`<div class="muted" style="font-size:11px">${R.adj.why.map(esc).join("<br>")}</div>`:""}</td><td>${R.base[0]}–${R.base[1]}°</td><td>${ZONE_T[R.zone]}<br><b>${R.rec[0]}–${R.rec[1]}°</b></td><td>${tStatus(measured(k,"av"),R)}</td><td>${tStatus(measured(k,"ap"),R)}</td></tr>`}).join("")}</tbody></table>`;}
+
+const RD_REFS={streis:["Streisfeld et al. (2017). Relationship between body positioning, muscle activity, and spinal kinematics in cyclists with and without low back pain. Sports Health (revue systématique).","https://sage.cnpereading.com/doi/10.1177/1941738116676260"],
+ vanhoof:["Van Hoof et al. (2012). Lower lumbar kinematics in cyclists with low back pain (flexion pattern). Manual Therapy.","https://pure.ul.ie/en/publications/comparing-lower-lumbar-kinematics-in-cyclists-with-low-back-pain-/"],
+ partin:["Partin et al. (2012). The bar sinister: does handlebar level damage the pelvic floor in female cyclists? J Sex Med.","https://stacks.cdc.gov/view/cdc/193316"],
+ brub:["Brubacher & Leversedge (2017). Ulnar neuropathy in cyclists. Hand Clinics.","https://www.hand.theclinics.com/article/S0749-0712%2816%2930084-1/fulltext"],
+ slane:["Slane et al. (2011). The influence of glove and hand position on pressure over the ulnar nerve during cycling. Clin Biomech.","https://uwnmbl.engr.wisc.edu/pubs/cb11_slane.pdf"],
+ wads:["Wadsworth & Weinrauch (2019). The role of a bike fit in cyclists with hip pain. Int J Sports Phys Ther.","https://pmc.ncbi.nlm.nih.gov/articles/PMC6818133/"],
+ husband:["Husband et al. (2024). Cycling position optimisation – a systematic review. J Sports Sci.","https://pubmed.ncbi.nlm.nih.gov/39285616/"]};
+function reachDrop(){const R={reach:{s:0,why:[]},drop:{s:0,why:[]}},used=new Set();
+ const add=(t,v,txt,ref)=>{if(!v)return;R[t].s+=v;R[t].why.push({txt,ref});if(ref)used.add(ref);};
+ const T=(key,t,w,txt,ref)=>{const x=lv(key);if(x)add(t,w*x,`${txt} (${MITEM[key].l.toLowerCase()} ${sc(key)}/4)`,ref);};
+ if(pain(["lombaires"])){add("drop",2,"Douleur lombaire actuelle : un cintre bas augmente la flexion lombo-sacrée","streis");add("reach",1,"Douleur lombaire actuelle : limiter la flexion lombaire basse","vanhoof");}
+ if(pain(["nuque"])){add("drop",2,"Douleur cervicale actuelle : un cintre bas augmente l'extension de la nuque");add("reach",1,"Douleur cervicale actuelle");}
+ if(pain(["trapeze","omoplates","epaule"])){add("reach",2,"Douleur d'épaule, de trapèze ou entre les omoplates actuelle : épaules tirées vers l'avant");}
+ if(pain(["perinee"])){add("drop",2,"Douleur ou engourdissement du périnée : un cintre plus bas que la selle est associé à plus de pression périnéale","partin");}
+ if(pain(["poignet","coude"])){add("reach",2,"Douleur ou engourdissement poignet / main / coude : limiter le poids sur les mains","brub");add("drop",1,"Douleur poignet / main : la position basse augmente la pression sur le talon de la main","slane");}
+ if(pain(["hanche"])){add("drop",1,"Douleur de hanche : un drop important ferme l'angle de hanche","wads");}
+ if(patho("genou_ar")){add("reach",1.5,"Arrière du genou / ischio-jambiers : redresser le cycliste (document de référence)");add("drop",1.5,"Arrière du genou / ischio-jambiers : redresser le cycliste (document de référence)");}if(patho("haut_dos"))add("reach",1,"Haut du dos / épaules : potence plus courte (document de référence)");if(patho("lombalgie"))add("reach",0.5,"Lombalgie : potence plus courte (document de référence)");T("sorensen","drop",2,"Extenseurs du dos peu endurants","streis");T("sorensen","reach",1,"Extenseurs du dos peu endurants","streis");
+ T("shirado","reach",1,"Gainage abdominal faible");T("shirado","drop",1,"Gainage abdominal faible");
+ T("thor","drop",1,"Rachis thoracique raide");T("thor","reach",1,"Rachis thoracique raide");
+ T("cerv_ext","drop",2,"Extension cervicale limitée");T("main_sol","drop",1,"Chaîne postérieure peu souple");T("hanche_flex","drop",1,"Flexion de hanche limitée","wads");
+ T("epaules","reach",1,"Mobilité d'épaule limitée");T("pompes","reach",1,"Appui des bras limité");T("poignet","reach",0.5,"Poignets peu mobiles");
+ const pm=cur.pm||{};if(pm.mouvement==="monobloc")add("reach",0.5,"Profil monobloc : poste plus court et compact");if(pm.mouvement==="dissocie")add("reach",-0.5,"Profil dissocié : potence plus longue tolérée");
+ const ms=MAJ.map(catMean).filter(x=>x!=null),g=ms.length?ms.reduce((a,b)=>a+b,0)/ms.length:null;
+ const anyPain=(cur.douleurs||[]).some(p=>p.type!=="ant");
+ ["reach","drop"].forEach(t=>{const s=R[t].s;R[t].v=s>=2.5?"nettement":s>=1?"legerement":"conserver";
+  if(R[t].v==="conserver"&&g!=null&&g>=3.5&&!anyPain&&!Object.keys(cur.maj||{}).some(x=>sc(x)!=null&&sc(x)<=2))R[t].v="possible";});
+ if(isAero()){const ae=aeroEval().ok;["reach","drop"].forEach(t=>{if(["conserver","possible"].includes(R[t].v)){if(ae==="vert"){R[t].v="aero";R[t].why.push({txt:"Objectif aéro avec bilan favorable",ref:"husband"});}else if(ae==="orange"){R[t].v="aerol";R[t].why.push({txt:"Objectif aéro avec quelques freins dans le bilan"});}}});}R.used=used;return R;}
+const RD_V={aero:["ok","Allonger / abaisser progressivement"],aerol:["warn","Abaisser légèrement"],nettement:["bad","Réduire nettement"],legerement:["warn","Réduire légèrement"],conserver:["ok","Conserver"],possible:["ok","Conserver, voire allonger / abaisser"]};
+function rdRefNum(r){return Object.keys(RD_REFS).indexOf(r)+1;}
+function renderRD(){const el=$("#rdBox");if(el)el.innerHTML=rdHTML(true);}
+
+RD_REFS.menard=["Menard et al. (2018). Influence of saddle setback on knee joint forces in cycling. Sports Biomechanics.","https://hal.science/hal-03389873/file/Menard%202018%20Influence%20of%20saddle%20setback%20on%20knee%20joint%20forces%20in%20cycling.pdf"];
+RD_REFS.domalain=["Domalain et al. (2016). Bike fitting: influence of saddle fore-aft position on knee joint forces. J Sci Cycling (règle UCI des 5 cm).","https://www.researchgate.net/profile/Mathieu-Menard/publication/313823925"];
+function reculCalc(){const R={s:0,why:[]};const add=(v,txt,ref,force)=>{if(!v&&!force)return;R.s+=v;R.why.push({txt,ref,v});};
+ const T=(key,w,txt,ref)=>{const x=lv(key);if(x)add(w*x,`${txt} (${MITEM[key].l.toLowerCase()} ${sc(key)}/4)`,ref);};
+ if(pain(["genou_ar","ischio"]))add(2,"Douleur arrière du genou / ischio-jambiers : une selle reculée augmente la compression fémoro-tibiale (+14–15 %), liée au freinage des ischio-jambiers","menard");
+ if(pain(["genou_int","genou_ext"]))add(0.5,"Douleur de genou (interne / externe) : éviter un recul important","menard");
+ if(patho("bit"))add(1.5,"Bandelette ilio-tibiale / TFL : avancer la selle (pratique du praticien)");if(patho("piriforme"))add(0,"Piriforme / moyen fessier : ajuster le recul pour optimiser la flexion de hanche (à tester)",null,true);if(pain(["genou_av"]))add(0,"Douleur avant du genou : avancer la selle n'augmente pas les forces sur la rotule, un recul n'est donc pas justifié","menard",true);
+ if(pain(["lombaires"]))add(1,"Douleur lombaire : un recul important allonge la distance au cintre et accentue la flexion du buste","husband");
+ if(pain(["nuque"]))add(1,"Douleur cervicale : un recul important incline davantage le buste, donc plus d'extension de la nuque","husband");
+ if(pain(["poignet","coude"]))add(1,"Douleur ou engourdissement des mains / coude : limiter le report de poids vers l'avant lié à un buste plus allongé","brub");
+ if(pain(["epaule","trapeze","omoplates"]))add(0.5,"Douleur d'épaule / trapèze : éviter d'allonger la position");
+ if(pain(["hanche","fessier"]))add(1,"Douleur de hanche / fessier : une selle plus avancée ouvre l'angle tronc-cuisse","wads");
+ T("hanche_flex",1,"Flexion de hanche limitée : avancer ouvre l'angle de hanche","wads");
+ T("pont1",0.5,"Extension de hanche peu performante : éviter une selle trop reculée");T("pont2",0.5,"Extension de hanche peu performante : éviter une selle trop reculée");
+ T("sorensen",0.5,"Extenseurs du dos peu endurants","husband");
+ const pm=cur.pm||{};if(pm.profil==="aerien")add(0.5,"Profil aérien : position plus haute et avancée sur le pédalier");if(pm.profil==="terrien")add(-1,"Profil terrien : appui en recul, poussée par la cuisse et la hanche");
+ if(pm.declenchement==="hanche")add(-0.5,"Déclenchement cuisse / hanche");
+ const d=cur.f.discipline;if(d==="clm")add(1,"Pratique triathlon / chrono : selle généralement plus avancée");
+ R.v=R.s>=2.5?"avn":R.s>=1?"avl":R.s<=-1?"rec":"cons";
+ if(["route","route_sport","gravel","vtt"].includes(d)&&(R.v==="avn"||R.v==="avl"))R.uci=true;return R;}
+const RC_V={avn:["bad","Avancer nettement"],avl:["warn","Avancer légèrement"],cons:["ok","Conserver"],rec:["warn","Reculer légèrement"]};
+const RC_EX={avn:"avancer la selle sur les rails (ou tige de selle sans recul) puis revérifier la hauteur et l'angle de genou",avl:"avancer la selle de quelques millimètres puis revérifier la hauteur",cons:"pas de modification nécessaire d'après le bilan",rec:"reculer légèrement la selle si le confort et les genoux le permettent ; éviter un recul important"};
+function rdHTML(full){const R=reachDrop(),RC=reculCalc();const lab={reach:"Reach (distance selle → cintre)",drop:"Drop (écart selle / cintre)"};
+ const ex={reach:{nettement:"potence plus courte, cintre à reach court, cocottes reculées",legerement:"potence 10 mm plus courte ou cocottes légèrement reculées",conserver:"pas de modification nécessaire d'après le bilan",aero:"potence plus longue ou à angle négatif, par paliers de 5–10 mm",aerol:"un palier modéré seulement (5–10 mm), puis réévaluer",possible:"un reach plus long est envisageable si l'objectif est la performance, de façon progressive"},
+  drop:{nettement:"remonter le poste (entretoises, potence à angle positif), viser un cintre proche du niveau de la selle",legerement:"ajouter des entretoises ou retourner la potence",conserver:"pas de modification nécessaire d'après le bilan",aero:"retirer des entretoises par paliers de 5 mm, potence à angle négatif",aerol:"retirer une entretoise (5 mm) puis réévaluer",possible:"un drop plus important est envisageable si l'objectif est la performance, de façon progressive"}};
+ const whyL=list=>full&&list.length?`<ul style="margin:6px 0 0;padding-inline-start:18px;font-size:12.5px">${list.map(w=>`<li>${esc(w.txt)}${w.ref?` <span class="ref">[${rdRefNum(w.ref)}]</span>`:` <span class="muted">(pratique clinique)</span>`}</li>`).join("")}</ul>`:"";
+ let rows=["reach","drop"].map(t=>`<tr><td><b>${lab[t]}</b></td><td><span class="pill ${RD_V[R[t].v][0]}">${RD_V[R[t].v][1]}</span></td><td>${ex[t][R[t].v]}${whyL(R[t].why)}</td></tr>`).join("");
+ rows+=`<tr><td><b>Recul de selle</b></td><td><span class="pill ${RC_V[RC.v][0]}">${RC_V[RC.v][1]}</span></td><td>${RC_EX[RC.v]}${RC.uci?`<div class="muted" style="font-size:12px">En compétition UCI sur route : nez de selle au moins 5 cm en arrière de l'axe du pédalier${full?` <span class="ref">[${rdRefNum("domalain")}]</span>`:""}.</div>`:""}${(RC.v==="avn"||RC.v==="avl")&&(R.reach.v==="conserver"||R.reach.v==="possible")?`<div class="muted" style="font-size:12px">Avancer la selle raccourcit aussi le reach : compenser par la potence si besoin.</div>`:""}${whyL(RC.why)}</td></tr>`;
+ let h=`<table><thead><tr><th>Cote</th><th>Orientation</th><th>Pistes</th></tr></thead><tbody>${rows}</tbody></table>`;
+ if(full)h+=`<p class="muted" style="font-size:12px">Les études donnent une direction, pas de valeur en mm. Après toute modification du recul, revérifier la hauteur de selle et les angles. Ajuster par petites étapes selon la position sur le vélo.</p><ol class="refs">${Object.keys(RD_REFS).map(r=>`<li>${esc(RD_REFS[r][0])} <a href="${RD_REFS[r][1]}" target="_blank" rel="noopener">Lien</a></li>`).join("")}</ol>`;
+ return h;}
+function rdReport(full){return `<h3>${full?"Reach, drop et recul de selle":"Orientation du poste de pilotage et de la selle"}</h3>`+rdHTML(full);}
+
+function kopsTarget(){const d=cur.f.discipline;let t=d==="clm"?[-2,12]:[-5,5],tol=d==="clm"?[-8,20]:[-12,12];const why=[];
+ why.push(d==="clm"?"Base triathlon / chrono : genou légèrement en avant de l'axe":"Base : genou à l'aplomb de l'axe de pédale (neutre)");
+ let sh=0;try{const RC=reculCalc();sh=RC.v==="avn"?5:RC.v==="avl"?3:RC.v==="rec"?-3:0;if(sh)why.push(`Bilan (onglet 3) : ${RC_V[RC.v][1].toLowerCase()} la selle → cible décalée de ${sh>0?"+":""}${sh} mm`);}catch(e){}
+ return {t:[t[0]+sh,t[1]+sh],tol:[tol[0]+sh,tol[1]+sh],why};}
+function kopsStatus(v,T){if(v==null)return '<span class="muted">—</span>';const s=(v>0?"+":"")+v+" mm ";if(v>=T.t[0]&&v<=T.t[1])return s+'<span class="pill ok">Dans la cible</span>';if(v>=T.tol[0]&&v<=T.tol[1])return s+'<span class="pill warn">Toléré</span>';return s+`<span class="pill bad">${v>T.tol[1]?"Genou trop en avant":"Genou trop en arrière"}</span>`;}
+function updKops(){const el=$("#kopsInfo");if(!el)return;const T=kopsTarget();const a=rv("kops","av"),b=rv("kops","ap");const d=a!=null&&b!=null?Math.round((b-a)*10)/10:null;
+ el.innerHTML=`<table><thead><tr><th>Cible</th><th>Tolérance</th><th>Avant</th><th>Après</th><th>Différence</th></tr></thead><tbody><tr><td><b>${T.t[0]} à ${T.t[1]>0?"+":""}${T.t[1]} mm</b></td><td>${T.tol[0]} à ${T.tol[1]>0?"+":""}${T.tol[1]} mm</td><td>${kopsStatus(a,T)}</td><td>${kopsStatus(b,T)}</td><td class="delta ${d>0?"pos":d<0?"neg":""}">${d==null?"—":(d>0?"+":"")+d+" mm"+(d?" — genou "+(d>0?"plus en avant":"plus en arrière"):"")}</td></tr></tbody></table><p class="muted" style="font-size:12px;margin-block:6px 0">${T.why.map(esc).join(" · ")}</p>`;}
+function kopsReport(){const a=rv("kops","av"),b=rv("kops","ap");if(a==null&&b==null)return "";const T=kopsTarget();const d=a!=null&&b!=null?Math.round((b-a)*10)/10:null;
+ return `<h3>KOPS (genou / axe de pédale, manivelle à 3 h)</h3><table><thead><tr><th>Cible</th><th>Avant</th><th>Après</th><th>Différence</th></tr></thead><tbody><tr><td>${T.t[0]} à ${T.t[1]} mm</td><td>${kopsStatus(a,T)}</td><td>${kopsStatus(b,T)}</td><td>${d==null?"—":(d>0?"+":"")+d+" mm"}</td></tr></tbody></table>`;}
+
+function isAero(){return cur.f.obj_pos==="aero";}
+function grade(keys){const v=keys.map(k=>sc(k)).filter(x=>x!=null);if(!v.length)return null;const m=Math.min(...v);return m<=1?"rouge":m===2?"orange":"vert";}
+function aeroEval(){const C=[];const pm=cur.pm||{};
+ const add=(l,g,txt,ref)=>C.push({l,g,txt,ref});
+ const gH=grade(["hanche_flex","squat","fessiers"]);add("Mobilité de hanche",gH,gH==="vert"?"Hanche assez mobile pour fermer l'angle tronc-cuisse":gH==="orange"?"Hanche un peu limitée : ouvrir la hanche (manivelles, recul) avant d'abaisser":"Hanche limitée : l'abaissement fermerait trop la hanche");
+ let gS=null;const sv=num(mget("sorensen").val);if(sv!=null)gS=sv>=100?"vert":sv>=75?"orange":"rouge";else gS=grade(["sorensen"]);
+ add("Extenseurs du dos (Sorensen)",gS,gS==="vert"?"Endurance suffisante pour tenir le buste bas":"Endurance insuffisante : risque d'effondrement en flexion lombaire",sv!=null?null:null);
+ let gG=grade(["shirado","deadbug"]);const shv=num(mget("shirado").val);if(shv!=null){const g2=shv>=155?"vert":shv>=116?"orange":"rouge";gG=gG==null?g2:[gG,g2].includes("rouge")?"rouge":[gG,g2].includes("orange")?"orange":"vert";}
+ add("Gainage (Shirado, dead bug)",gG,gG==="vert"?"Bassin bien contrôlé":"Contrôle du bassin à renforcer");
+ const gC=grade(["cerv_ext","thor"]);add("Extension cervicale et thoracique",gC,gC==="vert"?"Peut regarder la route buste bas":"Regarder la route buste bas sera contraignant pour la nuque");
+ const gE=grade(["epaules","pompes"]);add("Épaules et appui des bras",gE,gE==="vert"?"Supporte un appui avant plus engagé":"Appui avant à ménager (reach, largeur de cintre)");
+ const pz=(cur.douleurs||[]).filter(p=>p.type!=="ant"&&["lombaires","nuque","perinee","poignet","coude","hanche","trapeze","omoplates"].includes(p.zone)).map(p=>ZMAP[p.zone][1]);
+ add("Douleurs actuelles",pz.length?"rouge":"vert",pz.length?"À traiter avant d'abaisser : "+[...new Set(pz)].join(", "):"Aucune douleur limitante signalée");
+ if(pm.mouvement)add("Mouvement",pm.mouvement==="monobloc"?"vert":"orange",pm.mouvement==="monobloc"?"Monobloc : tolère une position compacte et basse":"Dissocié : garder de l'espace aux épaules, cintre standard");
+ if(pm.largeur)add("Largeur",pm.largeur==="axial"?"vert":"orange",pm.largeur==="axial"?"Axial : cintre plus étroit possible":"Latéral : conserver une largeur de cintre standard");
+ const vit=num(cur.f.vit_course);if(vit!=null)add("Vitesse en course",vit>=40?"vert":vit>=30?"orange":"rouge",vit>=40?`${vit} km/h : le gain aéro est important`:vit>=30?`${vit} km/h : gain aéro réel mais compromis avec la puissance`:`${vit} km/h : gain aéro faible, une position plus relevée reste préférable`,"fint");
+ if(cur.f.sexe_f==="oui")add("Périnée",null,"Cycliste femme : surveiller la pression périnéale quand le cintre descend sous la selle","partin");
+ const gs=C.map(c=>c.g).filter(Boolean);const reds=C.filter(c=>c.g==="rouge"&&c.l!=="Vitesse en course").length,oranges=C.filter(c=>c.g==="orange").length+(C.find(c=>c.l==="Vitesse en course"&&c.g==="rouge")?1:0);
+ const ev=C.filter(c=>c.g!=null&&!["Mouvement","Largeur","Vitesse en course","Douleurs actuelles"].includes(c.l)).length;
+ let ok=reds?"rouge":oranges>=2?"orange":"vert";if(ev<3&&ok==="vert")ok="incomplet";
+ return {C,ok};}
+const AERO_V={vert:["ok","Position aéro possible","Le bilan permet d'abaisser et d'allonger la position, par paliers."],orange:["warn","Abaissement progressif et limité","Quelques freins : abaisser modérément, en commençant par ouvrir la hanche."],rouge:["bad","Pas d'abaissement pour l'instant","Un ou plusieurs feux rouges : travailler d'abord les points en rouge (douleur, mobilité, endurance)."],incomplet:["na","Bilan incomplet","Renseignez au moins les tests de hanche, Sorensen, gainage, cervicales et épaules."]};
+function aeroSteps(E){const pm=cur.pm||{};const st=[];
+ if(E.ok==="rouge"){st.push("Ne pas abaisser le poste pour l'instant ; régler une position de base confortable.");st.push("Programme de préparation ciblé sur les feux rouges, puis nouveau bilan.");return st;}
+ st.push("<b>1. Ouvrir la hanche</b> : manivelles plus courtes (remonter la selle d'autant) et recul de selle un peu plus avancé, en respectant 5 cm minimum nez de selle / axe de pédalier en compétition UCI sur route.");
+ st.push(`<b>2. Abaisser et allonger le poste</b> par paliers de quelques millimètres (retirer des entretoises, potence à angle négatif${pm.mouvement==="dissocie"?", potence un peu plus longue pour laisser de l'espace aux épaules":pm.mouvement==="monobloc"?", position compacte":""}), avec plusieurs sorties entre chaque palier.${E.ok==="orange"?" Rester modéré : un ou deux paliers maximum.":""}`);
+ st.push(pm.largeur==="lateral"||pm.mouvement==="dissocie"?"<b>3. Largeur</b> : conserver un cintre de largeur standard ; cocottes légèrement orientées vers l'intérieur au maximum.":"<b>3. Réduire la largeur</b> : cintre plus étroit et cocottes orientées vers l'intérieur (vérifier la conformité au règlement UCI).");
+ st.push("<b>4. Vérifier les angles</b> (onglet 4) : dos vers le bas de la fourchette, hanche toujours dans 42 ± 10°, épaule vers 90°, genou inchangé (revérifier la hauteur de selle).");
+ return st;}
+function aeroHTML(full){const E=aeroEval();const V=AERO_V[E.ok];const col={vert:"ok",orange:"warn",rouge:"bad"};
+ let h=`<div class="row" style="gap:10px;margin-block-end:8px"><span class="pill ${V[0]}" style="font-size:14px">${V[1]}</span><span class="muted">${V[2]}</span></div>`;
+ if(full)h+=`<table><thead><tr><th>Critère</th><th>Feu</th><th>Commentaire</th></tr></thead><tbody>${E.C.map(c=>`<tr><td>${c.l}</td><td>${c.g?`<span class="pill ${col[c.g]}">${c.g==="vert"?"Vert":c.g==="orange"?"Orange":"Rouge"}</span>`:'<span class="pill na">—</span>'}</td><td>${c.g==null&&c.l!=="Périnée"?'<span class="muted">Non évalué</span>':esc(c.txt)}</td></tr>`).join("")}</tbody></table>`;
+ h+=`<h4 style="margin-block:12px 4px">Ordre des réglages</h4><ul style="margin:0;padding-inline-start:20px">${aeroSteps(E).map(s=>`<li style="margin-block:5px">${s}</li>`).join("")}</ul>`;
+ if(full)h+=`<p class="muted" style="font-size:12px;margin-block-start:10px">Baisser le buste réduit la traînée mais diminue la puissance : un buste totalement à plat n'est pas optimal, et sous 30 km/h une position plus relevée est préférable (Fintelman et al., 2014, J Biomech). Les seuils des feux sont des repères de pratique à ajuster.</p>`;
+ return h;}
+function renderAero(){const c=$("#aeroCard");if(!c)return;c.hidden=!isAero();if(isAero())$("#aeroBox").innerHTML=aeroHTML(true);}
+function aeroReport(full){if(!isAero())return "";return `<h3>${full?"Objectif position aéro — évaluation":"Votre objectif : position aéro"}</h3>`+aeroHTML(full);}
+
+const SA_REFS={schwarzer:["Schwarzer et al. (2002). Cycling and penile oxygen pressure: the type of saddle matters. Eur Urol.","https://www.europeanurology.com/article/S0302-2838%2801%2900028-8/fulltext"],
+ litwi:["Litwinowicz et al. (2021). Strategies for reducing the impact of cycling on the perineum in healthy males: systematic review and meta-analysis. Sports Med.","https://link.springer.com/article/10.1007/s40279-020-01363-z"],
+ amend:["Amend et al. (2023). The effect of bike seat models on perineal pressure during cycling. Urology.","https://www.goldjournal.net/article/S0090-4295%2823%2900459-4/fulltext"],
+ partin:["Partin et al. (2012). The bar sinister: does handlebar level damage the pelvic floor in female cyclists? J Sex Med.","https://stacks.cdc.gov/view/cdc/193316"],
+ slane:["Slane et al. (2011). The influence of glove and hand position on pressure over the ulnar nerve during cycling. Clin Biomech.","https://uwnmbl.engr.wisc.edu/pubs/cb11_slane.pdf"],
+ brub:["Brubacher & Leversedge (2017). Ulnar neuropathy in cyclists. Hand Clinics.","https://www.hand.theclinics.com/article/S0749-0712%2816%2930084-1/fulltext"],
+ chiara:["Chiaramonte et al. (2022). Preventive strategies, exercises, and rehabilitation of hand neuropathy in cyclists: a systematic review. J Hand Ther.","https://www.handtherapyacademy.com/treatments/cyclist-injuries-avoiding-hand-injuries-and-treatment-strategies/"]};
+function saRef(r){return ` <span class="ref">[${Object.keys(SA_REFS).indexOf(r)+1}]</span>`;}
+function selleCalc(){const P=(cur.douleurs||[]).filter(p=>p.type!=="ant");const per=P.filter(p=>p.zone==="perinee"),han=P.filter(p=>["poignet","coude"].includes(p.zone)),fes=P.filter(p=>p.zone==="fessier");
+ const S={per:[],han:[],gen:[],alert:[]};const fem=cur.f.sexe_f==="oui";
+ if(per.length){const maxI=Math.max(...per.map(p=>+p.int||0));
+  S.per.push(`<b>Largeur de selle</b> : mesurer l'écartement des ischions et choisir une selle assez large ; la largeur protège davantage que le rembourrage.${saRef("schwarzer")}${saRef("amend")}`);
+  S.per.push(`<b>Forme</b> : selle avec canal ou découpe centrale ; si la gêne persiste, envisager une selle sans bec (moins de pression périnéale, mais moins de stabilité et plus d'appui à l'arrière).${saRef("litwi")}`);
+  S.per.push(`<b>Inclinaison</b> : partir d'une selle à plat ; ne pas relever le nez. Une légère inclinaison vers l'avant peut soulager, mais fait glisser vers l'avant et charge les mains (pratique clinique).`);
+  S.per.push(`<b>Hauteur du cintre</b> : éviter un cintre nettement plus bas que la selle${fem?" — associé à plus de pression périnéale et moins de sensibilité chez les cyclistes femmes":""}.${saRef("partin")}`);
+  S.per.push(`<b>Habitude</b> : se lever sur les pédales régulièrement, environ toutes les dix minutes.${saRef("litwi")}`);
+  if(maxI>=6)S.alert.push("Douleur ou engourdissement périnéal important : orienter vers un médecin (urologue, gynécologue) si les symptômes persistent après l'arrêt du vélo.");}
+ if(han.length){const maxI=Math.max(...han.map(p=>+p.int||0));const desc=han.map(p=>(p.desc||"").toLowerCase()).join(" ");
+  S.han.push(`<b>Gants rembourrés</b> : ils réduisent de 10 à 28 % la pression sur le talon de la main côté auriculaire.${saRef("slane")}`);
+  S.han.push(`<b>Varier la position des mains</b> (cocottes, haut et bas du cintre) ; la position en bas du cintre est celle qui charge le plus le talon de la main et met le poignet le plus en extension.${saRef("slane")}${saRef("chiara")}`);
+  S.han.push(`<b>Réduire le poids sur les mains</b> : reach et drop modérés (voir bloc ci-dessus), selle pas inclinée vers l'avant.${saRef("brub")}`);
+  S.han.push(`<b>Poignet neutre</b> : réorienter les cocottes et l'angle du cintre ; envisager un ruban de cintre plus épais (pratique clinique).`);
+  if(sc("deadbug")!=null&&sc("deadbug")<=2||sc("shirado")!=null&&sc("shirado")<=2)S.han.push("<b>Gainage</b> : un tronc mieux tenu reporte moins de poids sur les mains (pratique clinique).");
+  S.alert.push(`Engourdissements des mains : vérifier aussi les cervicales et la sortie thoracique, le nerf peut être comprimé plus haut.${saRef("brub")}${maxI>=6||/faibless|maladr|atroph/.test(desc)?" Faiblesse ou symptômes persistants : avis médical.":""}`);}
+ if(patho("ischio_per",true))S.gen.push("<b>Ischions / périnée (document de référence)</b> : selle 2 à 3 cm plus large que les ischions ; rechercher une répartition 60 / 40 arrière / avant.");if(patho("piriforme"))S.gen.push("<b>Piriforme / moyen fessier (document de référence)</b> : incliner légèrement la selle vers l'avant.");if(patho("carpien"))S.han.push("<b>Gants (document de référence)</b> : gel ou mousse, épaisseur maximale recherchée 3 mm."); if(fes.length)S.gen.push("Douleur fessière / ischions : vérifier la largeur de selle par rapport aux ischions et le recul de selle (pratique clinique).");
+ if(!per.length&&!han.length)S.gen.push("Aucune douleur périnéale ni des mains signalée : selle à plat, largeur adaptée aux ischions, gants et changements réguliers de position des mains.");
+ return S;}
+function selleHTML(full){const S=selleCalc();let h="";
+ const ul=(t,l)=>l.length?`<h4 style="margin-block:10px 4px">${t}</h4><ul style="margin:0;padding-inline-start:20px">${l.map(x=>`<li style="margin-block:5px">${full?x:x.replace(/ <span class="ref">\[\d+\]<\/span>/g,"").replace(/ \(pratique clinique\)/g,"")}</li>`).join("")}</ul>`:"";
+ h+=formeHTML(full);h+=ul("Périnée",S.per)+ul("Mains et poignets",S.han)+ul("Général",S.gen);
+ if(S.alert.length)h+=`<div class="reco" style="border-inline-start-color:#b91c1c;margin-block-start:10px">${S.alert.map(a=>full?a:a.replace(/ <span class="ref">\[\d+\]<\/span>/g,"")).join("<br>")}</div>`;
+ if(full&&(S.per.length||S.han.length))h+=`<ol class="refs" style="margin-block-start:10px">${Object.keys(SA_REFS).map(r=>`<li>${esc(SA_REFS[r][0])} <a href="${SA_REFS[r][1]}" target="_blank" rel="noopener">Lien</a></li>`).join("")}</ol>`;
+ return h;}
+function renderSelle(){const el=$("#selleBox");if(el)el.innerHTML=selleHTML(true);}
+function selleReport(full){const P=(cur.douleurs||[]).some(p=>p.type!=="ant"&&["perinee","poignet","coude","fessier"].includes(p.zone));if(!P&&!(cur.pm&&(cur.pm.mouvement||cur.pm.largeur))&&!isAero())return "";return `<h3>${full?"Selle et appuis":"Selle et appuis : nos conseils"}</h3>`+selleHTML(full);}
+
+function selleForme(){const pm=cur.pm||{},m=pm.mouvement,l=pm.largeur;let prof=null,pw=[];
+ if(m==="monobloc"&&l==="axial"){prof="Plate";pw.push("Monobloc : base d'appui large et fixe, le bassin ne doit pas bouger","Axial : buste fixe et centré, une selle plate et plutôt étroite convient");}
+ else if(m==="monobloc"&&l==="lateral"){prof="Plate, arrière large";pw.push("Monobloc : selle plate et stable","Latéral : arrière assez large pour l'appui d'un ischion à l'autre");}
+ else if(m==="dissocie"&&l==="lateral"){prof="Arrondie";pw.push("Dissocié : la selle accompagne la micro-rotation du bassin","Latéral : balancier d'un appui à l'autre, arrière large");}
+ else if(m==="dissocie"&&l==="axial"){prof="Semi-arrondie";pw.push("Dissocié : micro-rotation du bassin à accompagner","Axial : buste stable, éviter un profil trop arrondi");}
+ else if(m==="monobloc"){prof="Plate";pw.push("Monobloc : base d'appui large et fixe");}
+ else if(m==="dissocie"){prof="Semi-arrondie à arrondie";pw.push("Dissocié : micro-rotation du bassin à accompagner");}
+ else if(l==="axial"){prof="Plate";pw.push("Axial : buste fixe et centré");}
+ else if(l==="lateral"){prof="Semi-arrondie, arrière large";pw.push("Latéral : balancier d'un appui à l'autre");}
+ let s=0;const fw=[];const A=(v,t)=>{s+=v;fw.push(t);};const d=cur.f.discipline;
+ if(isAero())A(2,"Objectif position aéro : bassin basculé vers l'avant, un bec long toucherait le périnée");
+ if(d==="clm")A(2,"Pratique triathlon / chrono : position engagée");else if(d==="route_sport")A(1,"Pratique route performance : position engagée");
+ if(d==="urbain")A(-2,"Pratique urbaine : position relevée");else if(d==="route"||d==="gravel"||d==="vtt")A(-0.5,(d==="vtt"?"VTT":d==="gravel"?"Gravel":"Route endurance")+" : déplacements fréquents sur la selle");
+ if(pain(["perinee"]))A(2,"Douleur ou engourdissement du périnée : bec court ou absent, avec canal ou découpe");
+ if(cur.f.sexe_f==="oui")A(0.5,"Cycliste femme : les selles à bec court et arrière large sont souvent mieux tolérées");
+ try{const R=reachDrop();if(R.drop.v==="nettement"||R.drop.v==="legerement")A(-0.5,"Poste à remonter : position plus relevée");}catch(e){}
+ if(m==="dissocie")A(-0.5,"Profil dissocié : bouge davantage sur la selle");
+ const forme=s>=1.5?"V":s<=-1?"T":"VT";
+ return {prof,pw,forme,fw,decoupe:pain(["perinee"])};}
+const FORME_T={V:["En V — bec court, arrière large","Selle courte (environ 24–25 cm) qui s'élargit vite, idéalement avec canal ou découpe."],T:["En T — bec long, classique","Selle longue (environ 27–28 cm), bec étroit, pour pouvoir avancer et reculer sur la selle."],VT:["V ou T selon le ressenti","Aucun élément ne fait pencher nettement : tester les deux formes, en commençant par celle que le cycliste utilise."]};
+function formeHTML(full){const F=selleForme();const ul=l=>full&&l.length?`<ul style="margin:4px 0 0;padding-inline-start:18px;font-size:12.5px">${l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+ return `<h4 style="margin-block:4px 4px">Forme de selle conseillée</h4><table><tbody>
+ <tr><th style="width:28%">Profil (plat / arrondi)</th><td>${F.prof?`<b>${F.prof}</b>`:'<span class="muted">Renseignez le mouvement et la largeur dans les préférences motrices (onglet Évaluation).</span>'}${ul(F.pw)}</td></tr>
+ <tr><th>Forme (V / T)</th><td><b>${FORME_T[F.forme][0]}</b><div class="muted" style="font-size:12.5px">${FORME_T[F.forme][1]}${F.decoupe?" Découpe ou canal central recommandé.":""}</div>${ul(F.fw)}</td></tr>
+ </tbody></table>${full?`<p class="muted" style="font-size:12px;margin-block:6px 0">Profil plat / arrondi : pratique clinique (grille du profil moteur), pas d'étude comparative. Bec court ou absent : moins de pression périnéale, au prix d'une stabilité moindre.${saRef("litwi")} Si le bassin se balance d'un côté à l'autre, vérifier d'abord la hauteur de selle.</p>`:""}`;}
+
+const PATHOS=[
+ {g:"Pieds",k:"plante",l:"Plante du pied (névrome de Morton, fasciite plantaire)",z:"pied",r:[
+  ["Cales","Favoriser une zone de meilleure répartition de pression ; changer de modèle de cale pour une plus grande surface d'appui (ex. Look Keo vers Shimano)."],
+  ["Semelles","Semelles spécifiques pour soutenir la voûte plantaire et répartir la pression."],
+  ["Chaussures","Vérifier largeur, pointure, forme et mesh : les chaussures ne doivent pas être trop étroites."]]},
+ {g:"Pieds",k:"achille",l:"Talon (tendinite d'Achille)",z:"achille",r:[
+  ["Cales","Reculer les cales pour réduire l'étirement du tendon d'Achille et le bras de levier sur celui-ci."],
+  ["Hauteur de selle","Abaisser légèrement la selle pour limiter la longueur demandée à la chaîne musculaire postérieure."]]},
+ {g:"Pieds",k:"pied_lat",l:"Côtés du pied (syndrome de compression)",z:"pied",r:[
+  ["Chaussures","Vérifier largeur, pointure, forme et mesh des chaussures."],
+  ["Cales varus / valgus","Cales compensatrices entre la chaussure et la cale, en surveillant les conséquences sur le genou et la hanche. Solution de dernière chance."]]},
+ {g:"Genoux",k:"fp",l:"Avant du genou (syndrome fémoro-patellaire)",z:"genou_av",r:[
+  ["Hauteur de selle","Principal réglage jouant sur les contraintes fémoro-patellaires : remonter la selle pour réduire la flexion excessive du genou."],
+  ["Recul de selle","Le KOPS peut être intéressant mais n'est pas l'argument principal (aligner le rebord antérieur de la rotule avec la tête du 1er métatarsien)."],
+  ["Cales","Vérifier l'ajustement des cales pour éviter une rotation interne / externe non physiologique du genou."]]},
+ {g:"Genoux",k:"bit",l:"Côté du genou (syndrome de la bandelette ilio-tibiale / TFL)",z:"genou_ext",r:[
+  ["Hauteur de selle","Un abaissement de la selle peut diminuer la charge sur la bandelette."],
+  ["Recul de selle","Avancer la selle pour soulager le tenseur du fascia lata (TFL) et la bandelette ilio-tibiale."],
+  ["Cales","Ajuster les cales pour éviter une rotation non physiologique des genoux vers l'intérieur ou l'extérieur."],
+  ["Position des pieds","Cales de compensation si pronation excessive ; en dernier recours, semelles orthopédiques avant."]]},
+ {g:"Genoux",k:"genou_ar",l:"Arrière du genou (hyperextension, tendinite des ischio-jambiers)",z:"genou_ar",r:[
+  ["Hauteur de selle","Abaisser la selle pour réduire l'extension excessive du genou au point bas."],
+  ["Manivelles","Manivelles plus courtes pour réduire l'amplitude du genou."],
+  ["Cales","Reculer les cales pour diminuer la mise en tension de la chaîne musculaire postérieure."],
+  ["Reach et drop","Diminuer l'un ou les deux pour redresser le cycliste et diminuer la tension globale de la chaîne postérieure."]]},
+ {g:"Hanches et bassin",k:"piriforme",l:"Hanche postérieure / latérale (piriforme, moyen fessier)",z:"fessier",r:[
+  ["Recul de selle","Ajuster le recul pour optimiser la flexion des hanches."],
+  ["Inclinaison de selle","Incliner légèrement la selle vers l'avant pour engager le cycliste vers l'avant et soulager la zone d'assise."],
+  ["Hauteur de selle","Objectif : éviter le déhanchement."]]},
+ {g:"Hanches et bassin",k:"ischio_per",l:"Ischions (ischialgies) ou périnée",z:"perinee",r:[
+  ["Selle","Choisir taille, forme et évidement adaptés : 2 à 3 cm plus large que les ischions."],
+  ["Recul / inclinaison / hauteur","Rechercher le meilleur combo pour une répartition homogène des pressions entre les 5 points d'appui : 60 / 40 arrière / avant."]]},
+ {g:"Hanches et bassin",k:"lombalgie",l:"Lombalgie",z:"lombaires",r:[
+  ["Hauteur, recul et inclinaison de selle","Ajuster pour éviter une flexion excessive. Attention : ne pas dépasser 80 % des capacités de souplesse."],
+  ["Potence","Potence plus courte pour réduire le reach et limiter la flexion lombaire."],
+  ["Hauteur de cintre","Modifier le nombre de bagues sous la potence pour réduire le drop et la demande de flexion du rachis."]]},
+ {g:"Dos et épaules",k:"haut_dos",l:"Haut du dos et épaules",z:"trapeze",r:[
+  ["Hauteur de cintre","Relever le cintre pour réduire la tension sur le haut du dos et les épaules."],
+  ["Potence","Potence plus courte pour rapprocher le guidon et réduire la tension sur les épaules."],
+  ["Largeur de cintre","Correspondre à la largeur des épaules (de manière normée) : plus étroit pour l'aéro, plus large pour la stabilité et le confort."]]},
+ {g:"Dos et épaules",k:"cervicalgie",l:"Cervicalgie",z:"nuque",r:[
+  ["Hauteur de cintre","Relever le cintre pour réduire le drop et donc la demande d'extension cervicale."],
+  ["Cocottes","Encourager une position des mains plus neutre : rotation ou réglage en hauteur des cocottes."]]},
+ {g:"Mains et poignets",k:"carpien",l:"Engourdissement des mains (canal carpien, neuropathie du cycliste)",z:"poignet",r:[
+  ["Cintre","Ajuster l'inclinaison du cintre pour une meilleure répartition du poids sur les mains ; vérifier la largeur de cintre."],
+  ["Leviers de frein","Ajuster les leviers pour un accès plus confortable et moins de tension dans les poignets."],
+  ["Gants","Gel ou mousse (jusqu'à 1/3 de pression en moins) ; épaisseur maximale recherchée : 3 mm."]]},
+ {g:"Mains et poignets",k:"poignet_tend",l:"Poignets (tendinites, compression nerveuse)",z:"poignet",r:[
+  ["Cintre","Adapter la hauteur du cintre ou sa forme."],
+  ["Ruban de cintre","Ruban plus épais ou ergonomique pour absorber les vibrations et réduire la pression."],
+  ["Gants","Port de gants."],
+  ["Cocottes","Rotation des cocottes."]]}];
+const PMAP=Object.fromEntries(PATHOS.map(p=>[p.k,p]));
+function pathoOptions(){let h='<option value="">— Aucune / non précisée —</option>',g="";PATHOS.forEach(p=>{if(p.g!==g){if(g)h+="</optgroup>";h+=`<optgroup label="${p.g}">`;g=p.g;}h+=`<option value="${p.k}">${p.l}</option>`;});return h+"</optgroup>";}
+function patho(k,anteToo){return (cur.douleurs||[]).some(p=>p.patho===k&&(anteToo||p.type!=="ant"));}
+function pathoList(){const seen={};(cur.douleurs||[]).forEach((p,i)=>{if(!p.patho||!PMAP[p.patho])return;const s=seen[p.patho]=seen[p.patho]||{n:[],cur:false,cote:new Set()};s.n.push(i+1);if(p.type!=="ant")s.cur=true;if(p.cote)s.cote.add(p.cote);});return seen;}
+function pathoHTML(full){const S=pathoList();const ks=Object.keys(S);if(!ks.length)return full?'<p class="muted">Aucune pathologie précisée. Choisissez une pathologie dans la liste de chaque douleur pour afficher les recommandations associées.</p>':"";
+ let h=ks.map(k=>{const P=PMAP[k],s=S[k];return `<div class="pm" style="margin-block-end:10px"><h3>${esc(P.l)} <span class="pill ${s.cur?"bad":"na"}">${s.cur?"Douleur actuelle":"Antécédent"}</span> <span class="muted" style="font-size:12px;font-weight:400">n° ${s.n.join(", ")}${s.cote.size?" · "+[...s.cote].join(", ").toLowerCase():""}</span></h3>
+ <table><tbody>${P.r.map(r=>`<tr><th style="width:26%">${esc(r[0])}</th><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table>${!s.cur&&full?'<p class="muted" style="font-size:12px;margin:4px 0 0">Antécédent : recommandations à garder en prévention ; elles ne modifient pas les calculs automatiques.</p>':""}</div>`;}).join("");
+ h+=`<p class="muted" style="font-size:12.5px">Sur toutes ces problématiques, un suivi de renforcement ou de rééducation est vivement conseillé : le réglage peut ne pas suffire.</p>`;
+ return h;}
+function renderPatho(){const el=$("#pathoBox");if(el)el.innerHTML=pathoHTML(true);}
+function pathoReport(full){const h=pathoHTML(full);return h?`<h3>${full?"Recommandations selon les pathologies":"Recommandations liées à vos douleurs"}</h3>`+h:"";}
+
+function calesReco(){const pm=cur.pm||{};const L=[];const A=(t,why)=>L.push({t,why});
+ let ap=0;const apw=[];
+ if(pm.profil==="terrien"){ap-=2;apw.push("profil terrien");}if(pm.profil==="aerien"){ap+=1;apw.push("profil aérien");}
+ if(patho("achille")||pain(["achille","mollet"])){ap-=2;apw.push("tendon d'Achille / mollet");}
+ if(patho("genou_ar")){ap-=1;apw.push("arrière du genou");}
+ if(lv("pointe")){ap-=1;apw.push("mollet peu endurant");}if(lv("rebonds")){ap-=0.5;apw.push("cheville peu réactive");}
+ if(sc("rebonds")===4&&sc("pointe")===4){ap+=0.5;apw.push("cheville forte et réactive");}
+ const apv=ap<=-2?"Cales reculées au maximum":ap<=-0.5?"Cales plutôt reculées":ap>=1?"Cales centrées ou légèrement avancées":"Cales en position centrée (référence)";
+ A(`<b>Avancée / recul</b> : ${apv}`,apw.length?"Selon : "+apw.join(", "):"Aucun élément du bilan ne fait pencher");
+ if(pm.largeur==="lateral")A("<b>Latéral (facteur Q)</b> : facteur Q large — axes de pédales plus longs, cales poussées vers l'intérieur pour écarter les pieds","Profil latéral");
+ else if(pm.largeur==="axial")A("<b>Latéral (facteur Q)</b> : facteur Q étroit — pieds proches du cadre","Profil axial");
+ if(patho("fp")||patho("bit"))A("<b>Rotation</b> : vérifier la rotation des cales pour éviter une rotation interne / externe non physiologique du genou","Pathologie du genou (document de référence)");
+ else if(lv("hanche_rot"))A("<b>Rotation</b> : respecter l'orientation naturelle du pied, liberté angulaire (float) plus importante","Rotation de hanche limitée");
+ if(patho("plante"))A("<b>Modèle de cale</b> : plus grande surface d'appui (ex. Look Keo vers Shimano), semelles de soutien de voûte","Plante du pied (document de référence)");
+ if(patho("pied_lat"))A("<b>Cales varus / valgus</b> : en dernier recours, en surveillant genou et hanche","Côtés du pied (document de référence)");
+ if(patho("bit"))A("<b>Pronation</b> : semelles orthopédiques d'abord, cales de compensation en dernier recours","Bandelette / TFL (document de référence)");
+ if(lv("pieds")||lv("single_squat"))A("<b>Alignement genou-pied</b> : vérifier écartement des cales, semelles ou cales correctrices","Force des pieds / single squat limités");
+ const asy=Object.keys(cur.maj||{}).filter(k=>/Déficit/.test((cur.maj[k]||{}).asym||""));if(asy.length)A("<b>Asymétrie</b> : régler côté par côté si nécessaire (rotation, position, cales d'épaisseur)",asy.map(k=>MITEM[k].l).join(", "));
+ return L;}
+function calesRecoHTML(full){const L=calesReco();return `<ul style="margin:0;padding-inline-start:20px">${L.map(x=>`<li style="margin-block:6px">${x.t}${full?`<span class="why" style="display:block;font-size:12px;color:var(--muted)">${esc(x.why)}</span>`:""}</li>`).join("")}</ul>`;}
+function angSumHTML(){return `<table><thead><tr><th>Articulation</th><th>Référence</th><th>Cible conseillée</th></tr></thead><tbody>${ANGLES.map(([k,l])=>{const R=recRange(k);return `<tr><td>${l}</td><td>${R.base[0]}–${R.base[1]}°</td><td><span class="pill ${R.zone==="milieu"?"na":"warn"}">${ZONE_T[R.zone]}</span> <b>${R.rec[0]}–${R.rec[1]}°</b></td></tr>`}).join("")}</tbody></table><p class="muted" style="font-size:12px">Détail des raisons et mesures avant / après dans l'onglet Angles.</p>`;}
+function renderRecos(){try{renderPatho();renderAero();renderRD();renderSelle();}catch(e){}
+ const c=$("#calesRecoBox");if(c)c.innerHTML=calesRecoHTML(true);const a=$("#angSumBox");if(a)a.innerHTML=angSumHTML();
+ const n=$("#recoNoAero");if(n)n.hidden=isAero();}
+function calesRecoReport(full){return `<h3>${full?"Orientation des cales":"Vos cales"}</h3>`+calesRecoHTML(full);}
+
+
+/* ---------- V2 : persistance locale, PWA et synchronisation ---------- */
+const IDB_NAME="hls-postur-v2",IDB_STORE="dossiers";
+function idbOpen(){return new Promise((resolve,reject)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{const x=r.result;if(!x.objectStoreNames.contains(IDB_STORE))x.createObjectStore(IDB_STORE,{keyPath:"id"});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+async function idbAll(){const x=await idbOpen();return new Promise((resolve,reject)=>{const r=x.transaction(IDB_STORE,"readonly").objectStore(IDB_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});}
+async function idbPut(v){const x=await idbOpen();return new Promise((resolve,reject)=>{const r=x.transaction(IDB_STORE,"readwrite").objectStore(IDB_STORE).put(v);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error);});}
+async function idbDelete(id){const x=await idbOpen();return new Promise((resolve,reject)=>{const r=x.transaction(IDB_STORE,"readwrite").objectStore(IDB_STORE).delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error);});}
+function scheduleAutoSave(){clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(()=>{if(fullName(cur.f)||Object.keys(cur.f||{}).some(k=>cur.f[k]))save(true);},700);}
+function setSyncState(st,msg){const dot=$("#syncDot"),txt=$("#syncText");if(!dot||!txt)return;dot.className="syncdot "+(st==="ok"?"ok":st==="error"?"bad":st==="offline"?"off":"");txt.textContent=msg||(st==="ok"?"Données synchronisées":st==="error"?"Erreur de synchronisation":st==="offline"?"Hors ligne · dossiers enregistrés sur cet appareil":"Modifications à synchroniser");}
+const cloudCfg=()=>{try{return JSON.parse(localStorage.getItem("hls-cloud")||"{}");}catch(e){return {};}};
+const cloudToken=()=>localStorage.getItem("hls-cloud-token")||"";
+function cloudHeaders(extra){const c=cloudCfg();return Object.assign({apikey:c.key||"",Authorization:"Bearer "+cloudToken(),"Content-Type":"application/json"},extra||{});}
+function loadCloudForm(){const c=cloudCfg();if($("#sbUrl")){$("#sbUrl").value=c.url||"";$("#sbKey").value=c.key||"";$("#sbEmail").value=localStorage.getItem("hls-cloud-email")||c.email||"";}const m=$("#cloudMsg");if(m)m.textContent=cloudToken()?"Connecté. La synchronisation automatique est active.":c.url?"Configuration enregistrée. Connectez-vous pour synchroniser.":"Aucune synchronisation en ligne configurée.";}
+
+function validCloudCredentials(){
+ const email=$("#sbEmail").value.trim();
+ const password=$("#sbPassword").value;
+ if(!email||!email.includes("@")){toast("Saisissez une adresse e-mail valide");$("#sbEmail").focus();return null;}
+ if(!password||password.length<8){toast("Le mot de passe doit contenir au moins 8 caractères");$("#sbPassword").focus();return null;}
+ return {email,password};
+}
+function saveCloudSession(j,email){
+ if(!j||!j.access_token||!j.user?.id) return false;
+ localStorage.setItem("hls-cloud-token",j.access_token);
+ localStorage.setItem("hls-cloud-refresh",j.refresh_token||"");
+ localStorage.setItem("hls-cloud-user",j.user.id);
+ localStorage.setItem("hls-cloud-email",j.user.email||email||"");
+ localStorage.setItem("hls-cloud-exp",String(Date.now()+((j.expires_in||3600)*1000)));
+ return true;
+}
+async function cloudSignup(){
+ const c=cloudCfg(),cred=validCloudCredentials();if(!cred)return;
+ if(!c.url||!c.key){toast("Enregistrez d’abord l’URL Supabase et la clé publique");return;}
+ try{
+  $("#cloudMsg").textContent="Création du compte…";
+  const r=await fetch(c.url.replace(/\/$/,"")+"/auth/v1/signup",{method:"POST",headers:{apikey:c.key,Authorization:"Bearer "+c.key,"Content-Type":"application/json"},body:JSON.stringify({email:cred.email,password:cred.password})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.msg||j.error_description||j.message||"Création du compte refusée");
+  if(saveCloudSession(j,cred.email)){ $("#cloudMsg").textContent="Compte créé et connecté. Synchronisation en cours…";await syncCloud(); }
+  else { $("#cloudMsg").textContent="Compte créé. Confirmez l’e-mail reçu, puis cliquez sur Se connecter et synchroniser.";toast("Consultez votre e-mail pour confirmer le compte"); }
+ }catch(e){$("#cloudMsg").textContent="Création impossible : "+e.message;setSyncState("error");}
+}
+async function cloudLogin(){
+ const c=cloudCfg(),cred=validCloudCredentials();if(!cred)return;
+ if(!c.url||!c.key){toast("Enregistrez d’abord l’URL Supabase et la clé publique");return;}
+ try{
+  setSyncState("pending","Connexion…");
+  const r=await fetch(c.url.replace(/\/$/,"")+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:c.key,Authorization:"Bearer "+c.key,"Content-Type":"application/json"},body:JSON.stringify({email:cred.email,password:cred.password})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.msg||j.error_description||j.message||"Connexion refusée");
+  if(!saveCloudSession(j,cred.email))throw new Error("Réponse de connexion incomplète");
+  $("#cloudMsg").textContent="Connecté. Synchronisation en cours…";await syncCloud();
+ }catch(e){setSyncState("error");$("#cloudMsg").textContent="Connexion impossible : "+e.message;}
+}
+async function syncCloud(silent){const c=cloudCfg(),tok=cloudToken(),uid=localStorage.getItem("hls-cloud-user");if(!navigator.onLine){setSyncState("offline");return;}if(!c.url||!c.key||!tok||!uid){setSyncState("pending","Enregistré localement");return;}try{setSyncState("pending","Synchronisation…");const base=c.url.replace(/\/$/,"")+"/rest/v1/hls_dossiers";const rr=await fetch(base+"?select=id,data,updated_at&user_id=eq."+encodeURIComponent(uid),{headers:cloudHeaders()});if(!rr.ok)throw new Error("Lecture distante refusée (table ou droits à vérifier)");const remote=await rr.json();const byId=Object.fromEntries(db.map(x=>[x.id,x]));for(const row of remote){const loc=byId[row.id];if(!loc||String(row.updated_at||"")>String(loc.updatedAt||"")){const d=row.data;d.updatedAt=row.updated_at;d.syncState="synced";byId[d.id]=d;await idbPut(d);}}
+ db=Object.values(byId);for(const d of db){const newer=!remote.find(r=>r.id===d.id)||String(d.updatedAt||"")>String((remote.find(r=>r.id===d.id)||{}).updated_at||"");if(newer){const body={id:d.id,user_id:uid,updated_at:d.updatedAt||new Date().toISOString(),data:d};const wr=await fetch(base+"?on_conflict=id",{method:"POST",headers:cloudHeaders({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(body)});if(!wr.ok)throw new Error("Écriture distante refusée (RLS à vérifier)");d.syncState="synced";await idbPut(d);}}
+ renderList();setSyncState("ok");$("#cloudMsg").textContent="Dernière synchronisation : "+new Date().toLocaleString("fr-FR");if(!silent)toast("Synchronisation terminée");}catch(e){setSyncState("error");if($("#cloudMsg"))$("#cloudMsg").textContent="Synchronisation impossible : "+e.message;}}
+async function initV2(){try{db=await idbAll();renderList();setSyncState(navigator.onLine?(cloudToken()?"pending":"ok"):"offline",navigator.onLine?(db.length+" dossier(s) disponible(s)"):("Hors ligne · "+db.length+" dossier(s) disponible(s)"));}catch(e){setSyncState("error","Stockage local indisponible");}loadCloudForm();}
+$("#clientSearch").addEventListener("input",renderList);$("#btnClientNew").addEventListener("click",()=>$("#btnNew").click());$("#btnSync").addEventListener("click",()=>syncCloud());
+$("#btnCloudSave").addEventListener("click",()=>{localStorage.setItem("hls-cloud",JSON.stringify({url:$("#sbUrl").value.trim(),key:$("#sbKey").value.trim(),email:$("#sbEmail").value.trim()}));loadCloudForm();toast("Configuration enregistrée sur cet appareil");});
+$("#btnCloudSignup").addEventListener("click",cloudSignup);$("#btnCloudLogin").addEventListener("click",cloudLogin);$("#btnCloudLogout").addEventListener("click",()=>{["hls-cloud-token","hls-cloud-refresh","hls-cloud-user","hls-cloud-email","hls-cloud-exp"].forEach(k=>localStorage.removeItem(k));loadCloudForm();setSyncState(navigator.onLine?"ok":"offline","Mode local");});
+window.addEventListener("online",()=>{setSyncState("pending");syncCloud(true);});window.addEventListener("offline",()=>setSyncState("offline"));
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;$("#btnInstall").hidden=false;});$("#btnInstall").addEventListener("click",async()=>{if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$("#btnInstall").hidden=true;}});
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("./service-worker-v21.js").catch(()=>{});
+loadForm();renderList();renderRecos();initV2();
+
+})();
+</script>
+</body>
+</html>
